@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Encuesta de Satisfacción · CMGA</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --navy:#1B3A6B; --teal:#1A8A6F; --bg:#F3F6FA; --card:#fff; --tx:#1d2733; --mut:#5f6b7a; --ln:#dbe2ea;
+  --e:#1A8A6F; --b:#5DB98F; --r:#E3A72F; --m:#C8423B; --na:#8a96a3;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:Arial,Helvetica,sans-serif}
+button{font-family:inherit}
+.top{background:#fff;color:var(--navy);display:flex;align-items:center;justify-content:space-between;padding:10px 18px;gap:12px;border-bottom:4px solid var(--navy);flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{height:62px;width:auto;display:block}
+#subTop{font-size:14px;font-weight:700;color:var(--navy);text-align:right}
+#subTop::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--teal);margin-right:8px;vertical-align:middle}
+@media (max-width:560px){.top{justify-content:center}.brand img{height:50px}#subTop{width:100%;text-align:center;font-size:13px}}
+.progress{height:6px;background:#dfe6ee}
+#bar{height:100%;width:0;background:var(--teal);transition:width .3s}
+main{max-width:860px;margin:0 auto;padding:18px 16px 110px}
+#vPanel{max-width:1200px;padding-bottom:40px}
+h2{color:var(--navy);margin:6px 0 4px;font-size:24px}
+.sub{color:var(--mut);margin:0 0 16px;font-size:15px}
+.q{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:14px;margin-bottom:12px}
+.qt{font-size:17px;font-weight:600;margin-bottom:10px;line-height:1.35}
+.qt .req{color:var(--m)}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.op{flex:1 1 0;min-width:96px;border:2px solid var(--ln);background:#fff;border-radius:12px;padding:10px 6px;font-size:15px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--tx);transition:transform .08s}
+.op:active{transform:scale(.97)}
+.op .f{font-size:26px;line-height:1}
+.op.txt{flex:0 1 auto;min-width:0;padding:12px 16px;flex-direction:row}
+.op.sel.e{background:var(--e);border-color:var(--e);color:#fff}
+.op.sel.b{background:var(--b);border-color:var(--b);color:#fff}
+.op.sel.r{background:var(--r);border-color:var(--r);color:#fff}
+.op.sel.m{background:var(--m);border-color:var(--m);color:#fff}
+.op.sel.na,.op.sel.g{background:var(--navy);border-color:var(--navy);color:#fff}
+.op.na{color:var(--mut)}
+.nps{display:grid;grid-template-columns:repeat(11,1fr);gap:5px}
+.nps .op{min-width:0;padding:12px 0;font-weight:700;font-size:17px}
+.nps .op.sel{color:#fff}
+.nps .op.sel.lo{background:var(--m);border-color:var(--m)}
+.nps .op.sel.mid{background:var(--r);border-color:var(--r)}
+.nps .op.sel.hi{background:var(--e);border-color:var(--e)}
+.npsl{display:flex;justify-content:space-between;color:var(--mut);font-size:13px;margin-top:6px}
+input[type=text],input[type=tel],input[type=date],input[type=password],select,textarea{width:100%;font-size:16px;padding:12px;border:2px solid var(--ln);border-radius:10px;font-family:inherit;background:#fff;color:var(--tx)}
+textarea{min-height:110px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--teal)}
+.hint{color:var(--mut);font-size:13px;margin-top:6px}
+.cond{margin-top:10px}
+#navBtns{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ln);padding:12px 16px;display:flex;gap:10px;justify-content:center;z-index:5}
+#navBtns[hidden]{display:none}
+#navBtns .in{max-width:860px;width:100%;display:flex;gap:10px}
+.btn{border:0;border-radius:12px;padding:14px 20px;font-size:17px;font-weight:700;cursor:pointer}
+.btn.pri{background:var(--teal);color:#fff;flex:1}
+.btn.sec{background:#e8edf3;color:var(--navy)}
+.btn.nav{background:var(--navy);color:#fff}
+.btn.sm{padding:9px 14px;font-size:14px}
+.btn:disabled{opacity:.5}
+.skip{background:none;border:1px dashed var(--na);color:var(--mut);border-radius:10px;padding:10px 14px;font-size:14px;cursor:pointer;margin-bottom:12px}
+.hero{text-align:center;padding:36px 10px}
+.hero h1{color:var(--navy);font-size:32px;margin:12px 0 10px}
+.hero p{font-size:18px;color:var(--mut);max-width:560px;margin:0 auto 8px;line-height:1.45}
+.hero .btn{margin-top:26px;font-size:22px;padding:18px 48px;flex:none}
+.pill{display:inline-block;background:#e3f2ec;color:var(--teal);padding:6px 12px;border-radius:20px;font-size:14px;font-weight:700}
+.secno{color:var(--teal);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.6px}
+.check{width:90px;height:90px;border-radius:50%;background:var(--teal);color:#fff;font-size:52px;display:flex;align-items:center;justify-content:center;margin:0 auto}
+footer{text-align:center;color:var(--mut);font-size:12px;padding:10px 10px 90px}
+footer a{color:var(--mut)}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--tx);color:#fff;padding:12px 18px;border-radius:10px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:50;max-width:90vw;text-align:center}
+#toast.show{opacity:1}
+.ov{position:fixed;inset:0;background:rgba(20,30,45,.55);display:flex;align-items:center;justify-content:center;z-index:40;padding:16px}
+.ov[hidden]{display:none}
+.mbox{background:#fff;border-radius:16px;padding:22px;max-width:460px;width:100%;max-height:90vh;overflow:auto}
+.mbox h3{margin:0 0 12px;color:var(--navy)}
+.mrow{display:flex;gap:10px;margin-top:16px;justify-content:flex-end}
+/* Panel */
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;background:#fff;border:1px solid var(--ln);border-radius:12px;padding:12px;margin-bottom:16px}
+.toolbar label{font-size:12px;color:var(--mut);display:flex;flex-direction:column;gap:4px}
+.toolbar input,.toolbar select{padding:8px;font-size:14px;width:auto}
+.toolbar .sp{flex:1}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:#fff;border:1px solid var(--ln);border-radius:12px;padding:14px;border-top:4px solid var(--navy)}
+.kpi .l{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
+.kpi .v{font-size:30px;font-weight:700;color:var(--navy);margin:6px 0 2px}
+.kpi .d{font-size:12px;color:var(--mut)}
+.kpi.ok{border-top-color:var(--e)}.kpi.warn{border-top-color:var(--r)}.kpi.bad{border-top-color:var(--m)}
+.card{background:#fff;border:1px solid var(--ln);border-radius:12px;padding:16px;margin-bottom:16px}
+.card h3{margin:0 0 4px;color:var(--navy);font-size:18px}
+.card .cs{color:var(--mut);font-size:13px;margin:0 0 12px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;border-bottom:2px solid var(--ln);padding:8px 6px}
+td{border-bottom:1px solid var(--ln);padding:8px 6px;vertical-align:middle}
+.barw{background:#eef2f6;border-radius:6px;height:14px;position:relative;min-width:120px}
+.barw>i{display:block;height:100%;border-radius:6px}
+.stk{display:flex;height:16px;border-radius:6px;overflow:hidden;min-width:160px;background:#eef2f6}
+.stk>i{display:block;height:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-bottom:8px}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;background:var(--c)}
+details.area{border-top:1px solid var(--ln);padding:6px 0}
+.arow{display:grid;grid-template-columns:minmax(150px,26%) 1fr 90px 90px 80px;gap:10px;align-items:center;font-size:14px}
+.arow.hd{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;border-bottom:2px solid var(--ln);padding:8px 6px}
+details.area summary{cursor:pointer;color:var(--navy);font-weight:600;padding:10px 6px;list-style:none}
+details.area summary::-webkit-details-marker{display:none}
+details.area summary .nm::before{content:"▸ ";color:var(--mut)}
+details.area[open] summary .nm::before{content:"▾ "}
+details.area[open]{background:#fafbfd;border-radius:8px}
+@media (max-width:760px){.arow{grid-template-columns:1fr 70px 60px}.arow .bc,.arow .nn{display:none}}
+.tag{display:inline-block;padding:3px 8px;border-radius:10px;font-size:12px;font-weight:700}
+.tag.ok{background:#e3f2ec;color:var(--e)}.tag.warn{background:#fbf0d9;color:#9a6a0c}.tag.bad{background:#f8e1df;color:var(--m)}.tag.nt{background:#eef2f6;color:var(--mut)}
+.alert{border:1px solid var(--ln);border-left:5px solid var(--m);border-radius:10px;padding:12px;margin-bottom:10px}
+.alert.at{border-left-color:var(--e);opacity:.75}
+.alert.sg{border-left-color:var(--r)}
+.alert .h{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;font-size:14px}
+.alert .mot{margin:8px 0;font-size:14px}
+.alert .seg{display:grid;grid-template-columns:180px 1fr auto;gap:8px;align-items:start}
+.alert .seg select,.alert .seg input{padding:8px;font-size:14px}
+.com{border-bottom:1px solid var(--ln);padding:10px 0;font-size:14px}
+.com small{color:var(--mut)}
+.empty{color:var(--mut);font-size:14px;padding:8px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.qrbox{display:flex;justify-content:center;margin:14px 0}
+#printWrap{display:none}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}.alert .seg{grid-template-columns:1fr}.op{min-width:72px;font-size:13px}.op .f{font-size:22px}.hero h1{font-size:26px}}
+@media print{
+  body>*{display:none!important}
+  #printWrap{display:flex!important;justify-content:center;align-items:center;min-height:95vh}
+  .pcard{border:3px solid #1B3A6B;border-radius:18px;padding:36px 40px;text-align:center;width:420px;font-family:Arial}
+  .pcard .pl{background:#1B3A6B;color:#fff;font-weight:700;padding:8px 14px;border-radius:8px;display:inline-block}
+  .pcard h1{color:#1B3A6B;font-size:28px;margin:18px 0 6px}
+  .pcard p{color:#333;font-size:16px;margin:4px 0}
+  .pcard .pq{display:flex;justify-content:center;margin:22px 0}
+  .pcard .pf{color:#1A8A6F;font-weight:700;margin-top:10px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><img src="data:image/png;base64,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" alt="Centro Médico Galerías Aguascalientes"></div>
+  <div id="subTop">Encuesta de satisfacción al egreso</div>
+</header>
+
+<!-- ============ ENCUESTA ============ -->
+<div id="vEncuesta">
+  <div class="progress"><div id="bar"></div></div>
+  <main><section id="wizard"></section></main>
+  <div id="navBtns" hidden><div class="in">
+    <button class="btn sec" id="btnAtras">← Atrás</button>
+    <button class="btn pri" id="btnSig">Siguiente →</button>
+  </div></div>
+  <footer><span id="pendInfo"></span> <a href="#" id="lnkPanel">Acceso supervisión</a></footer>
+</div>
+
+<!-- ============ PANEL ============ -->
+<main id="vPanel" hidden>
+  <div class="toolbar">
+    <label>Desde<input type="date" id="fDesde"></label>
+    <label>Hasta<input type="date" id="fHasta"></label>
+    <label>Servicio<select id="fServ"></select></label>
+    <button class="btn nav sm" id="btnRecargar">↻ Actualizar</button>
+    <div class="sp"></div>
+    <button class="btn sec sm" id="btnCSV">⬇ CSV</button>
+    <button class="btn sec sm" id="btnQR">▣ Código QR</button>
+    <button class="btn sec sm" id="btnSalir">Salir</button>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="card">
+    <h3>Satisfacción por área</h3>
+    <p class="cs">% de respuestas Excelente + Bueno sobre respuestas válidas (sin N/A). Meta: ≥ 90 %. Haga clic en un área para ver cada pregunta.</p>
+    <div id="tblAreas"></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h3>Seguridad y trato digno</h3><p class="cs">% de respuestas "Sí" (en 8.6, "Sí" es negativo: hubo un incidente sin resolver).</p><div id="tblSeg"></div></div>
+    <div class="card"><h3>Tendencia mensual</h3><p class="cs">Satisfacción global por mes, últimos 12 meses (respeta el filtro de servicio).</p><div id="tendencia"></div></div>
+  </div>
+  <div class="card"><h3>Alertas para seguimiento</h3><p class="cs">Se genera alerta con cualquier calificación "Malo", un "No" en 8.1–8.5 o un incidente sin resolver (8.6). Turnar al jefe de área en ≤ 48 h.</p><div id="alertas"></div></div>
+  <div class="grid2">
+    <div class="card"><h3>Comentarios y sugerencias</h3><div id="comentarios"></div></div>
+    <div class="card"><h3>Reconocimientos</h3><div id="reconoc"></div></div>
+  </div>
+</main>
+
+<div class="ov" id="ov" hidden><div class="mbox" id="mbox"></div></div>
+<div id="toast"></div>
+<div id="printWrap"></div>
+
+<script>
+/* ===================== CONFIGURACIÓN ===================== */
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzHJcK6JRmEa5xYznZ62jgClOB_hy9hvDFZb39r8TCm7vGQ5-hLqbKVHZsZnw4FCHOZ/exec';
+const LS_PEND = 'encuesta_cmga_pend_v1';
+const RESET_SEG = 20;          // segundos en la pantalla de "Gracias" antes de reiniciar
+const INACTIVIDAD_MIN = 4;     // minutos sin tocar la pantalla a media encuesta antes de preguntar si sigue ahí
+const META = 90;               // % meta de satisfacción
+const LOGO_SRC = document.querySelector('.brand img').src;   // logo incrustado en el encabezado
+
+/* ===================== CUESTIONARIO ===================== */
+const ESCALA = [
+  {v:'E',t:'Excelente',c:'e',f:'😀'},
+  {v:'B',t:'Bueno',c:'b',f:'🙂'},
+  {v:'R',t:'Regular',c:'r',f:'😐'},
+  {v:'M',t:'Malo',c:'m',f:'🙁'}
+];
+const NA = {v:'NA',t:'No aplica',c:'na',f:'—'};
+const AREAS = [
+  {id:'adm',titulo:'Admisión',ico:'🏥',items:[
+    ['a1','Tiempo de espera para su ingreso'],
+    ['a2','Amabilidad y trato del personal de Admisión'],
+    ['a3','Claridad de la información sobre trámites, costos estimados y documentos requeridos'],
+    ['a4','Explicación del reglamento, horarios de visita y derechos del paciente'],
+    ['a5','Rapidez para asignarle y llevarle a su habitación']]},
+  {id:'enf',titulo:'Enfermería',ico:'🩺',items:[
+    ['e1','El personal de enfermería se presentó y le llamó por su nombre'],
+    ['e2','Amabilidad, respeto y trato digno'],
+    ['e3','Rapidez para atender el timbre o sus llamados'],
+    ['e4','Le explicaron los procedimientos antes de realizarlos'],
+    ['e5','Atención oportuna de su dolor o molestias'],
+    ['e6','Le explicaron qué medicamentos le administraban y para qué'],
+    ['e7','Respeto a su privacidad e intimidad durante su atención'],
+    ['e8','Información y orientación sobre sus cuidados en casa al egreso']]},
+  {id:'med',titulo:'Atención médica',ico:'👨‍⚕️',items:[
+    ['m1','Su médico le visitó con la frecuencia que esperaba'],
+    ['m2','Le explicó su diagnóstico y tratamiento en palabras claras'],
+    ['m3','Resolvió sus dudas y las de su familia'],
+    ['m4','Le pidió su autorización (consentimiento) antes de procedimientos o cirugía'],
+    ['m5','Le dio indicaciones claras para su recuperación y citas de seguimiento']]},
+  {id:'nut',titulo:'Alimentos y nutrición',ico:'🍽️',skip:'No recibí alimentos del hospital',items:[
+    ['n1','Sabor y presentación de los alimentos'],
+    ['n2','Temperatura adecuada de los alimentos'],
+    ['n3','Puntualidad en el horario de entrega'],
+    ['n4','Le explicaron la dieta indicada por su médico'],
+    ['n5','Amabilidad del personal que le llevó los alimentos']]},
+  {id:'int',titulo:'Intendencia, limpieza y confort',ico:'🧹',items:[
+    ['i1','Limpieza de su habitación'],
+    ['i2','Limpieza y abasto del baño (papel, jabón, toallas)'],
+    ['i3','Limpieza de pasillos, salas de espera y áreas comunes'],
+    ['i4','Cambio de ropa de cama cuando fue necesario'],
+    ['i5','Amabilidad y discreción del personal de intendencia'],
+    ['i6','Comodidad de la habitación (temperatura, ruido, iluminación)'],
+    ['i7','Funcionamiento del equipo de la habitación (cama, TV, timbre, aire)']]},
+  {id:'lab',titulo:'Laboratorio e imagen',ico:'🔬',skip:'No me hicieron estudios',items:[
+    ['l1','Amabilidad del personal de laboratorio'],
+    ['l2','Habilidad al tomarle muestras (sin molestias innecesarias)'],
+    ['l3','Trato y explicación en Rayos X, ultrasonido o tomografía'],
+    ['l4','Tiempo de espera para realizar sus estudios']]},
+  {id:'caj',titulo:'Cajas y proceso de egreso',ico:'💳',items:[
+    ['c1','Amabilidad y atención del personal de Cajas'],
+    ['c2','Claridad en la explicación de su estado de cuenta'],
+    ['c3','El cobro correspondió a lo que le informaron al ingreso'],
+    ['c4','Tiempo de espera para pagar y recibir su alta administrativa'],
+    ['c5','Apoyo con trámites de aseguradora o facturación'],
+    ['c6','Tiempo total desde que le dieron el alta médica hasta salir del hospital']]}
+];
+const SEG = [
+  ['s1','¿Le colocaron un brazalete de identificación al ingresar?'],
+  ['s2','Antes de darle medicamentos o tomarle muestras, ¿confirmaron su nombre?'],
+  ['s3','¿Vio al personal lavarse las manos o usar gel antes de atenderle?'],
+  ['s4','¿Le informaron cómo prevenir caídas (barandales, pedir ayuda para levantarse)?'],
+  ['s5','¿Se sintió seguro(a) y protegido(a) durante su estancia?'],
+  ['s6','¿Tuvo algún problema o incidente que no fue resuelto?']
+];
+const GLOBAL = [['g1','Calificación general de la atención en CMGA'],['g2','Relación entre la calidad del servicio y el costo']];
+const SERVICIOS = ['Hospitalización','Cirugía / Quirófano','Terapia Intensiva','Urgencias','Gineco-obstetricia','Pediatría'];
+const ESTANCIAS = ['1 día','2 a 3 días','4 a 7 días','Más de 7 días'];
+const RESPONDE = ['Paciente','Familiar','Otro'];
+const ETIQ = {};
+AREAS.forEach(a=>a.items.forEach(([k,t])=>ETIQ[k]=a.titulo+': '+t));
+SEG.forEach(([k,t])=>ETIQ[k]='Seguridad: '+t);
+GLOBAL.forEach(([k,t])=>ETIQ[k]='Global: '+t);
+
+const PASOS = [{id:'inicio'},{id:'datos',titulo:'Datos generales'}]
+  .concat(AREAS.map(a=>({id:a.id,titulo:a.titulo,area:a})))
+  .concat([{id:'seg',titulo:'Seguridad y trato digno'},{id:'global',titulo:'Evaluación global'},{id:'coment',titulo:'Comentarios'},{id:'fin'}]);
+
+/* ===================== UTILIDADES ===================== */
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let toastT;
+function toast(m,ms=2600){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),ms);}
+function nuevoId(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);}
+function lsGet(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+async function api(body){
+  const r = await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),redirect:'follow'});
+  const j = await r.json();
+  if(!j.ok) throw new Error(j.error||'Error del servidor');
+  return j;
+}
+function hoyStr(d=new Date()){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+
+/* ===================== ENCUESTA ===================== */
+let paso = 0, R = {}, idCliente = null, resetT = null;
+
+function opBtn(k,o,extra=''){
+  const sel = R[k]===o.v ? ' sel':'';
+  return `<button type="button" class="op ${o.c||'g'}${sel} ${extra}" data-k="${k}" data-v="${esc(o.v)}">${o.f?`<span class="f">${o.f}</span>`:''}<span>${esc(o.t)}</span></button>`;
+}
+function textOps(k,lista){return `<div class="opts">${lista.map(t=>opBtn(k,{v:t,t:t,c:'g'},'txt')).join('')}</div>`;}
+function rating(k,texto,conNA=true){
+  const ops = ESCALA.concat(conNA?[NA]:[]);
+  return `<div class="q" id="q_${k}"><div class="qt">${esc(texto)}</div><div class="opts">${ops.map(o=>opBtn(k,o)).join('')}</div></div>`;
+}
+function inputTxt(k,ph,tipo='text'){return `<input type="${tipo}" data-k="${k}" value="${esc(R[k]||'')}" placeholder="${esc(ph)}" maxlength="120">`;}
+function areaTxt(k,ph){return `<textarea data-k="${k}" placeholder="${esc(ph)}" maxlength="1000">${esc(R[k]||'')}</textarea>`;}
+
+function render(){
+  const p = PASOS[paso], w = $('#wizard');
+  const total = PASOS.length-2;
+  $('#bar').style.width = (paso<=0?0:Math.min(100,(paso/(PASOS.length-1))*100))+'%';
+  $('#navBtns').hidden = (p.id==='inicio'||p.id==='fin');
+  $('#btnSig').textContent = p.id==='coment' ? 'Enviar encuesta ✓' : 'Siguiente →';
+  let h = '';
+  const cab = t => `<div class="secno">Sección ${paso} de ${total}</div><h2>${t}</h2>`;
+  if(p.id==='inicio'){
+    h = `<div class="hero">
+      <span class="pill">Toma alrededor de 3 minutos</span>
+      <h1>Su opinión nos ayuda a mejorar</h1>
+      <p>Califique la atención que recibió durante su estancia. La encuesta es <b>anónima y voluntaria</b>; sus respuestas no afectan su atención ni su cuenta.</p>
+      <p>Puede contestarla el paciente o un familiar.</p>
+      <button class="btn pri" data-act="comenzar">Comenzar</button></div>`;
+  } else if(p.id==='datos'){
+    h = cab('Datos generales') + `<p class="sub">Nos ayudan a saber a qué área enviar sus comentarios.</p>
+      <div class="q"><div class="qt">Servicio donde estuvo <span class="req">*</span></div>${textOps('servicio',SERVICIOS)}</div>
+      <div class="q"><div class="qt">Número de habitación (opcional)</div>${inputTxt('habitacion','Ej. 205')}</div>
+      <div class="q"><div class="qt">Días de estancia</div>${textOps('estancia',ESTANCIAS)}</div>
+      <div class="q"><div class="qt">¿Quién responde la encuesta?</div>${textOps('responde',RESPONDE)}
+        <div class="cond" id="c_respondeOtro" ${R.responde==='Otro'?'':'hidden'}>${inputTxt('respondeOtro','Especifique')}</div></div>
+      <div class="q"><div class="qt">¿Es su primera vez en CMGA?</div>${textOps('primeraVez',['Sí','No'])}</div>`;
+  } else if(p.area){
+    const a = p.area;
+    h = cab(a.ico+' '+a.titulo) + `<p class="sub">¿Cómo califica lo siguiente? Si no aplica a su caso, elija "No aplica".</p>`
+      + (a.skip?`<button class="skip" data-act="skip" data-a="${a.id}">${esc(a.skip)} → marcar todo "No aplica" y continuar</button>`:'')
+      + a.items.map(([k,t])=>rating(k,t)).join('');
+    if(a.id==='enf') h += `<div class="q"><div class="qt">¿Desea reconocer a alguna enfermera o enfermero? (opcional)</div>${inputTxt('reconocimientoEnf','Nombre')}</div>`;
+  } else if(p.id==='seg'){
+    h = cab('🛡️ Seguridad y trato digno') + `<p class="sub">Responda Sí o No según lo que recuerde.</p>`
+      + SEG.map(([k,t])=>`<div class="q" id="q_${k}"><div class="qt">${esc(t)}</div><div class="opts">${['Sí','No','No recuerdo'].map(v=>opBtn(k,{v,t:v,c:'g'},'txt')).join('')}</div>${k==='s6'?`<div class="cond" id="c_incidenteDesc" ${R.s6==='Sí'?'':'hidden'}>${areaTxt('incidenteDesc','Descríbalo brevemente para poder atenderlo')}</div>`:''}</div>`).join('');
+  } else if(p.id==='global'){
+    const nps = [...Array(11).keys()].map(n=>{const c=n<=6?'lo':(n<=8?'mid':'hi');return `<button type="button" class="op ${c}${R.nps===String(n)?' sel':''}" data-k="nps" data-v="${n}">${n}</button>`;}).join('');
+    h = cab('⭐ Evaluación global')
+      + GLOBAL.map(([k,t])=>rating(k,t,false)).join('')
+      + `<div class="q"><div class="qt">Del 0 al 10, ¿qué tan probable es que recomiende CMGA a un familiar o amigo?</div><div class="nps">${nps}</div><div class="npsl"><span>0 = Nada probable</span><span>10 = Muy probable</span></div></div>
+      <div class="q"><div class="qt">Si necesitara atención hospitalaria de nuevo, ¿regresaría a CMGA?</div>${textOps('regresaria',['Sí','Tal vez','No'])}</div>
+      <div class="q"><div class="qt">¿Qué área o persona le gustaría reconocer y por qué? (opcional)</div>${areaTxt('reconocimiento','Escriba aquí')}</div>`;
+  } else if(p.id==='coment'){
+    h = cab('💬 Comentarios y sugerencias')
+      + `<div class="q"><div class="qt">¿Qué podemos mejorar?</div>${areaTxt('comentarios','Escriba aquí sus comentarios o sugerencias (opcional)')}</div>
+      <div class="q"><div class="qt">¿Desea que nos comuniquemos con usted sobre su experiencia?</div>${textOps('contacto',['Sí','No'])}
+        <div class="cond" id="c_contacto" ${R.contacto==='Sí'?'':'hidden'}>
+          <div style="display:grid;gap:8px;margin-top:4px">${inputTxt('contactoNombre','Nombre')}${inputTxt('contactoTel','Teléfono','tel')}</div>
+          <div class="hint">Sus datos de contacto son opcionales y se tratarán conforme al Aviso de Privacidad de CMGA.</div>
+        </div></div>`;
+  } else if(p.id==='fin'){
+    h = `<div class="hero"><div class="check">✓</div><h1>¡Gracias por su opinión!</h1>
+      <p>Gracias por confiar su salud en nosotros. Le deseamos una pronta recuperación.</p>
+      <p class="hint" id="finFolio"></p>
+      <button class="btn pri" data-act="nueva">Nueva encuesta</button>
+      <p class="hint" id="finCuenta"></p></div>`;
+  }
+  w.innerHTML = h;
+  window.scrollTo(0,0);
+}
+
+function actualizarCondicionales(){
+  const m = {respondeOtro:R.responde==='Otro', incidenteDesc:R.s6==='Sí', contacto:R.contacto==='Sí'};
+  Object.entries(m).forEach(([id,on])=>{const el=document.getElementById('c_'+id); if(el) el.hidden=!on;});
+}
+
+document.addEventListener('click',e=>{
+  const b = e.target.closest('#wizard .op');
+  if(b){
+    const k=b.dataset.k, v=b.dataset.v;
+    if(R[k]===v){ delete R[k]; b.classList.remove('sel'); }   // tocar de nuevo = desmarcar
+    else{
+      R[k]=v;
+      b.parentElement.querySelectorAll('.op').forEach(x=>x.classList.toggle('sel',x===b));
+    }
+    actualizarCondicionales();
+    return;
+  }
+  const a = e.target.closest('[data-act]');
+  if(!a) return;
+  const act = a.dataset.act;
+  if(act==='comenzar'){ R={}; idCliente=nuevoId(); paso=1; render(); }
+  else if(act==='skip'){ const ar=AREAS.find(x=>x.id===a.dataset.a); ar.items.forEach(([k])=>R[k]='NA'); siguiente(); }
+  else if(act==='nueva'){ reiniciar(); }
+});
+document.addEventListener('input',e=>{
+  const el = e.target;
+  if(el.matches('#wizard [data-k]')){ const v=el.value; if(v.trim()) R[el.dataset.k]=v; else delete R[el.dataset.k]; }
+});
+
+function siguiente(){
+  const p = PASOS[paso];
+  if(p.id==='datos' && !R.servicio){ toast('Por favor seleccione el servicio donde estuvo'); return; }
+  if(p.id==='coment'){ enviar(); return; }
+  paso++; render();
+}
+$('#btnSig').onclick = siguiente;
+$('#btnAtras').onclick = ()=>{ if(paso>1){paso--;render();} else reiniciar(); };
+
+function motivosAlerta(d){
+  const m=[];
+  Object.keys(d).forEach(k=>{ if(d[k]==='M' && ETIQ[k]) m.push('Malo — '+ETIQ[k]); });
+  ['s1','s2','s3','s4','s5'].forEach(k=>{ if(d[k]==='No') m.push('No — '+ETIQ[k]); });
+  if(d.s6==='Sí') m.push('Incidente no resuelto'+(d.incidenteDesc?': '+d.incidenteDesc:''));
+  return m;
+}
+
+async function enviar(){
+  const btn=$('#btnSig'); btn.disabled=true; btn.textContent='Enviando…';
+  const datos = Object.assign({},R);
+  if(datos.contacto!=='Sí'){ delete datos.contactoNombre; delete datos.contactoTel; }
+  if(datos.responde!=='Otro') delete datos.respondeOtro;
+  if(datos.s6!=='Sí') delete datos.incidenteDesc;
+  datos.motivosAlerta = motivosAlerta(datos).join(' | ');
+  datos.version = '1';
+  const payload = {action:'guardar', idCliente, datos};
+  let folio = null;
+  try{ const r = await api(payload); folio = r.folio; }
+  catch(err){
+    const pend = lsGet(LS_PEND,[]); pend.push(payload); lsSet(LS_PEND,pend); actualizarPend();
+  }
+  btn.disabled=false;
+  paso = PASOS.length-1; render();
+  $('#finFolio').textContent = folio ? ('Folio: '+folio) : 'Su encuesta quedó guardada en este equipo y se enviará en cuanto haya conexión.';
+  let s = RESET_SEG;
+  const tick=()=>{ const el=$('#finCuenta'); if(!el) return; el.textContent='La pantalla se reiniciará en '+s+' s'; if(s--<=0) reiniciar(); else resetT=setTimeout(tick,1000); };
+  tick();
+}
+function reiniciar(){ clearTimeout(resetT); R={}; idCliente=null; paso=0; cerrarModal(); render(); }
+
+/* Cola sin conexión */
+function actualizarPend(){ const n=lsGet(LS_PEND,[]).length; $('#pendInfo').textContent = n? `⏳ ${n} encuesta(s) pendiente(s) de enviar ·`:''; }
+let enviando=false;
+async function flushPendientes(){
+  if(enviando) return; enviando=true;
+  try{
+    let pend = lsGet(LS_PEND,[]);
+    while(pend.length){
+      try{ await api(pend[0]); }catch(e){ break; }
+      pend.shift(); lsSet(LS_PEND,pend);
+    }
+  } finally { enviando=false; actualizarPend(); }
+}
+window.addEventListener('online',flushPendientes);
+setInterval(flushPendientes,60000);
+
+/* Inactividad a media encuesta (modo tablet) */
+let ultimoToque = Date.now(), inactT=null;
+['pointerdown','keydown','input'].forEach(ev=>document.addEventListener(ev,()=>{ultimoToque=Date.now();},true));
+setInterval(()=>{
+  const p=PASOS[paso];
+  if(!$('#vEncuesta').hidden && p.id!=='inicio' && p.id!=='fin' && $('#ov').hidden && Date.now()-ultimoToque > INACTIVIDAD_MIN*60000){
+    let s=30;
+    abrirModal(`<h3>¿Sigue contestando?</h3><p>La encuesta se reiniciará en <b id="inS">30</b> s por inactividad.</p><div class="mrow"><button class="btn pri" id="inSi">Sí, continuar</button></div>`);
+    $('#inSi').onclick=()=>{clearInterval(inactT);ultimoToque=Date.now();cerrarModal();};
+    inactT=setInterval(()=>{s--; const el=$('#inS'); if(el) el.textContent=s; if(s<=0){clearInterval(inactT);reiniciar();}},1000);
+  }
+},15000);
+
+/* ===================== MODAL ===================== */
+function abrirModal(h){ $('#mbox').innerHTML=h; $('#ov').hidden=false; }
+function cerrarModal(){ $('#ov').hidden=true; $('#mbox').innerHTML=''; }
+
+/* ===================== PANEL ===================== */
+let PIN = null, FILAS = [];
+$('#lnkPanel').onclick = e=>{
+  e.preventDefault();
+  abrirModal(`<h3>Acceso supervisión</h3><p class="hint">Ingrese el PIN del panel de resultados.</p><input type="password" id="pinIn" autocomplete="off"><div class="mrow"><button class="btn sec" id="pinNo">Cancelar</button><button class="btn nav" id="pinOk">Entrar</button></div>`);
+  const ok = async()=>{
+    const pin=$('#pinIn').value.trim(); if(!pin) return;
+    $('#pinOk').disabled=true; $('#pinOk').textContent='Verificando…';
+    try{ await api({action:'verificarPin',pin}); PIN=pin; cerrarModal(); abrirPanel(); }
+    catch(err){ toast(/PIN/i.test(err.message)?'PIN incorrecto':'Sin conexión con el servidor'); $('#pinOk').disabled=false; $('#pinOk').textContent='Entrar'; }
+  };
+  $('#pinOk').onclick=ok; $('#pinNo').onclick=cerrarModal;
+  $('#pinIn').addEventListener('keydown',ev=>{if(ev.key==='Enter')ok();});
+  setTimeout(()=>$('#pinIn').focus(),50);
+};
+$('#btnSalir').onclick=()=>{ PIN=null; FILAS=[]; $('#vPanel').hidden=true; $('#vEncuesta').hidden=false; $('#subTop').textContent='Encuesta de satisfacción al egreso'; reiniciar(); };
+
+function abrirPanel(){
+  $('#vEncuesta').hidden=true; $('#navBtns').hidden=true; $('#vPanel').hidden=false;
+  $('#subTop').textContent='Panel de resultados · Encuesta de satisfacción';
+  const h=new Date();
+  if(!$('#fDesde').value) $('#fDesde').value = hoyStr(new Date(h.getFullYear(),h.getMonth(),1));
+  if(!$('#fHasta').value) $('#fHasta').value = hoyStr(h);
+  $('#fServ').innerHTML = '<option value="">Todos</option>'+SERVICIOS.map(s=>`<option>${esc(s)}</option>`).join('');
+  cargarPanel();
+}
+async function cargarPanel(){
+  $('#kpis').innerHTML='<div class="empty">Cargando…</div>';
+  try{ const r = await api({action:'listar',pin:PIN}); FILAS = r.filas||[]; renderPanel(); }
+  catch(err){ $('#kpis').innerHTML=`<div class="empty">No se pudieron cargar los resultados: ${esc(err.message)}</div>`; }
+}
+$('#btnRecargar').onclick=cargarPanel;
+['fDesde','fHasta','fServ'].forEach(id=>$('#'+id).addEventListener('change',()=>renderPanel()));
+
+function filtradas(conFechas=true){
+  const d=$('#fDesde').value, h=$('#fHasta').value, s=$('#fServ').value;
+  return FILAS.filter(f=>(!s||f.servicio===s) && (!conFechas || ((!d||f.fecha>=d)&&(!h||f.fecha<=h))));
+}
+function contar(filas,keys){
+  const c={E:0,B:0,R:0,M:0,NA:0};
+  filas.forEach(f=>keys.forEach(k=>{const v=f[k]; if(c[v]!==undefined) c[v]++;}));
+  const val=c.E+c.B+c.R+c.M;
+  return {c,val,sat: val? (c.E+c.B)/val*100 : null, prom: val? (4*c.E+3*c.B+2*c.R+c.M)/val : null};
+}
+const pct = x => x==null ? '—' : (Math.round(x*10)/10).toFixed(1)+' %';
+const cls = x => x==null ? 'nt' : (x>=META?'ok':(x>=80?'warn':'bad'));
+const colorSat = x => x==null ? 'var(--na)' : (x>=META?'var(--e)':(x>=80?'var(--r)':'var(--m)'));
+const TODAS_KEYS = AREAS.flatMap(a=>a.items.map(i=>i[0]));
+
+function stk(c){
+  const t=c.E+c.B+c.R+c.M; if(!t) return '<span class="tag nt">Sin respuestas</span>';
+  return `<div class="stk" title="E ${c.E} · B ${c.B} · R ${c.R} · M ${c.M}">${['E','B','R','M'].map(v=>c[v]?`<i style="width:${c[v]/t*100}%;background:var(--${v.toLowerCase()})"></i>`:'').join('')}</div>`;
+}
+
+function renderPanel(){
+  const F = filtradas();
+  // KPIs
+  const glob = contar(F,TODAS_KEYS), g1=contar(F,['g1']);
+  const npsV = F.map(f=>f.nps).filter(v=>v!==''&&v!=null).map(Number).filter(n=>!isNaN(n));
+  const nps = npsV.length ? (npsV.filter(n=>n>=9).length - npsV.filter(n=>n<=6).length)/npsV.length*100 : null;
+  const reg = F.filter(f=>f.regresaria); const regSi = reg.length? reg.filter(f=>f.regresaria==='Sí').length/reg.length*100 : null;
+  const alertasPend = F.filter(f=>f.alerta==='Sí' && f.estadoSeguimiento!=='Atendida').length;
+  $('#kpis').innerHTML = [
+    {l:'Encuestas',v:F.length,d:'en el periodo',c:''},
+    {l:'Satisfacción global',v:pct(glob.sat),d:glob.val+' respuestas válidas',c:cls(glob.sat)},
+    {l:'Calificación general',v:pct(g1.sat),d:'Excelente + Bueno (9.1)',c:cls(g1.sat)},
+    {l:'Índice de recomendación',v:nps==null?'—':Math.round(nps),d:npsV.length+' resp. · promotores − detractores',c:nps==null?'':(nps>=50?'ok':(nps>=0?'warn':'bad'))},
+    {l:'Regresaría a CMGA',v:pct(regSi),d:reg.length+' respuestas',c:cls(regSi)},
+    {l:'Alertas pendientes',v:alertasPend,d:'sin marcar como atendidas',c:alertasPend?'bad':'ok'}
+  ].map(k=>`<div class="kpi ${k.c}"><div class="l">${k.l}</div><div class="v">${k.v}</div><div class="d">${k.d}</div></div>`).join('');
+
+  // Áreas
+  const leg = `<div class="legend"><span style="--c:var(--e)">Excelente</span><span style="--c:var(--b)">Bueno</span><span style="--c:var(--r)">Regular</span><span style="--c:var(--m)">Malo</span></div>`;
+  const filasA = AREAS.map(a=>{
+    const s = contar(F,a.items.map(i=>i[0]));
+    const det = a.items.map(([k,t])=>{const si=contar(F,[k]);return `<tr><td>${esc(t)}</td><td style="width:40%">${stk(si.c)}</td><td><span class="tag ${cls(si.sat)}">${pct(si.sat)}</span></td><td>${si.c.NA||0}</td></tr>`;}).join('');
+    return `<details class="area"><summary class="arow">
+        <span class="nm">${a.ico} ${esc(a.titulo)}</span>
+        <span class="bc"><div class="barw"><i style="width:${s.sat||0}%;background:${colorSat(s.sat)}"></i></div></span>
+        <span><span class="tag ${cls(s.sat)}">${pct(s.sat)}</span></span>
+        <span>${s.prom==null?'—':s.prom.toFixed(2)} / 4</span>
+        <span class="nn">${s.val} resp.</span></summary>
+        <div style="padding:0 6px 10px">${leg}<table><tr><th>Pregunta</th><th>Distribución</th><th>Satisf.</th><th>N/A</th></tr>${det}</table></div></details>`;
+  }).join('');
+  $('#tblAreas').innerHTML = `<div class="arow hd"><span>Área</span><span class="bc">Satisfacción</span><span>%</span><span>Puntaje</span><span class="nn">n</span></div>`+filasA;
+
+  // Seguridad
+  $('#tblSeg').innerHTML = `<table><tr><th>Pregunta</th><th>Sí</th><th>n</th></tr>`+SEG.map(([k,t])=>{
+    const r=F.filter(f=>f[k]==='Sí'||f[k]==='No'); const si=r.filter(f=>f[k]==='Sí').length; const p=r.length?si/r.length*100:null;
+    const c = p==null?'nt':(k==='s6'?(p===0?'ok':'bad'):cls(p));
+    return `<tr><td>${esc(t)}</td><td><span class="tag ${c}">${pct(p)}</span></td><td>${r.length}</td></tr>`;}).join('')+'</table>';
+
+  // Tendencia
+  const base = filtradas(false), meses=[]; const hoy=new Date();
+  for(let i=11;i>=0;i--){const d=new Date(hoy.getFullYear(),hoy.getMonth()-i,1); meses.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'));}
+  const NOM=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const datosT = meses.map(m=>{const fm=base.filter(f=>(f.fecha||'').slice(0,7)===m); return {m,n:fm.length,sat:contar(fm,TODAS_KEYS).sat};});
+  const W=560,H=200,pl=34,pb=26,bw=(W-pl)/12;
+  let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Satisfacción mensual">`;
+  [60,70,80,90,100].forEach(y=>{const yy=(H-pb)-(y-50)/50*(H-pb-10); svg+=`<line x1="${pl}" x2="${W}" y1="${yy}" y2="${yy}" stroke="${y===META?'#1A8A6F':'#e3e8ee'}" ${y===META?'stroke-dasharray="4 3"':''}/><text x="${pl-4}" y="${yy+4}" font-size="10" text-anchor="end" fill="#5f6b7a">${y}</text>`;});
+  datosT.forEach((d,i)=>{
+    const x=pl+i*bw+bw*0.18, w=bw*0.64, lab=NOM[Number(d.m.slice(5))-1];
+    if(d.sat!=null){const v=Math.max(50,d.sat), hh=(v-50)/50*(H-pb-10); svg+=`<rect x="${x}" y="${(H-pb)-hh}" width="${w}" height="${hh}" rx="3" fill="${colorSat(d.sat)}"><title>${lab}: ${pct(d.sat)} · ${d.n} encuestas</title></rect><text x="${x+w/2}" y="${(H-pb)-hh-4}" font-size="9.5" text-anchor="middle" fill="#1d2733">${Math.round(d.sat)}</text>`;}
+    svg+=`<text x="${x+w/2}" y="${H-10}" font-size="10" text-anchor="middle" fill="#5f6b7a">${lab}</text>`;
+  });
+  svg+='</svg>';
+  $('#tendencia').innerHTML = datosT.some(d=>d.n)? svg+'<div class="hint">Eje vertical desde 50 %. Línea punteada = meta 90 %.</div>' : '<div class="empty">Aún no hay encuestas.</div>';
+
+  // Alertas
+  const al = F.filter(f=>f.alerta==='Sí').sort((a,b)=>{const pa=a.estadoSeguimiento==='Atendida'?1:0,pb2=b.estadoSeguimiento==='Atendida'?1:0; return pa-pb2 || (b.fechaHora||'').localeCompare(a.fechaHora||'');});
+  $('#alertas').innerHTML = al.length ? al.map(f=>{
+    const est=f.estadoSeguimiento||'Pendiente', c=est==='Atendida'?'at':(est==='En seguimiento'?'sg':'');
+    const contacto = f.contacto==='Sí' ? `<div class="hint">Contacto: ${esc(f.contactoNombre||'')} ${esc(f.contactoTel||'')}</div>`:'';
+    return `<div class="alert ${c}" data-folio="${esc(f.folio)}">
+      <div class="h"><b>${esc(f.folio)} · ${esc(f.servicio||'')}${f.habitacion?' · Hab. '+esc(f.habitacion):''}</b><span class="hint">${esc(f.fechaHora||f.fecha||'')}</span></div>
+      <div class="mot">${esc(f.motivosAlerta||'Revisar respuestas').split(' | ').map(x=>'• '+x).join('<br>')}</div>
+      ${f.comentarios?`<div class="hint">Comentario: “${esc(f.comentarios)}”</div>`:''}${contacto}
+      <div class="seg" style="margin-top:8px">
+        <select>${['Pendiente','En seguimiento','Atendida'].map(o=>`<option ${o===est?'selected':''}>${o}</option>`).join('')}</select>
+        <input type="text" placeholder="Nota de seguimiento (acción tomada, responsable)" value="${esc(f.notaSeguimiento||'')}" maxlength="500">
+        <button class="btn nav sm" data-seg>Guardar</button>
+      </div>${f.fechaSeguimiento?`<div class="hint">Última actualización: ${esc(f.fechaSeguimiento)}</div>`:''}
+    </div>`;}).join('') : '<div class="empty">Sin alertas en el periodo. 👍</div>';
+
+  // Comentarios / reconocimientos
+  const com = F.filter(f=>f.comentarios||f.incidenteDesc).sort((a,b)=>(b.fechaHora||'').localeCompare(a.fechaHora||''));
+  $('#comentarios').innerHTML = com.length? com.map(f=>`<div class="com">${f.comentarios?esc(f.comentarios):''}${f.incidenteDesc?`<div><b>Incidente:</b> ${esc(f.incidenteDesc)}</div>`:''}<br><small>${esc(f.folio)} · ${esc(f.servicio||'')} · ${esc(f.fecha||'')}</small></div>`).join('') : '<div class="empty">Sin comentarios en el periodo.</div>';
+  const rec = F.filter(f=>f.reconocimiento||f.reconocimientoEnf).sort((a,b)=>(b.fechaHora||'').localeCompare(a.fechaHora||''));
+  $('#reconoc').innerHTML = rec.length? rec.map(f=>`<div class="com">${f.reconocimientoEnf?`<div><b>Enfermería:</b> ${esc(f.reconocimientoEnf)}</div>`:''}${f.reconocimiento?esc(f.reconocimiento):''}<br><small>${esc(f.folio)} · ${esc(f.servicio||'')} · ${esc(f.fecha||'')}</small></div>`).join('') : '<div class="empty">Sin reconocimientos en el periodo.</div>';
+}
+
+$('#alertas').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-seg]'); if(!b) return;
+  const card=b.closest('.alert'), folio=card.dataset.folio;
+  const estado=card.querySelector('select').value, nota=card.querySelector('input').value.trim();
+  b.disabled=true; b.textContent='Guardando…';
+  try{
+    const r = await api({action:'seguimiento',pin:PIN,folio,estado,nota});
+    const f=FILAS.find(x=>x.folio===folio); if(f){f.estadoSeguimiento=estado;f.notaSeguimiento=nota;f.fechaSeguimiento=r.fechaSeguimiento||'';}
+    toast('Seguimiento guardado'); renderPanel();
+  }catch(err){ toast('No se guardó: '+err.message); b.disabled=false; b.textContent='Guardar'; }
+});
+
+$('#btnCSV').onclick=()=>{
+  const F=filtradas(); if(!F.length){toast('No hay encuestas en el periodo');return;}
+  const cols=[]; F.forEach(f=>Object.keys(f).forEach(k=>{if(!cols.includes(k))cols.push(k);}));
+  const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const csv='\ufeff'+cols.map(q).join(',')+'\n'+F.map(f=>cols.map(c=>q(f[c])).join(',')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download=`encuestas_satisfaccion_${$('#fDesde').value}_a_${$('#fHasta').value}.csv`; a.click();
+};
+
+$('#btnQR').onclick=()=>{
+  const url = location.href.split('#')[0].split('?')[0];
+  abrirModal(`<h3>Código QR de la encuesta</h3><p class="hint">Imprímalo para colocarlo en habitaciones o en Cajas. Lleva directo a la encuesta.</p><div class="qrbox" id="qrM"></div><div class="hint" style="word-break:break-all;text-align:center">${esc(url)}</div><div class="mrow"><button class="btn sec" id="qrNo">Cerrar</button><button class="btn nav" id="qrPrint">Imprimir tarjeta</button></div>`);
+  if(window.QRCode){ new QRCode($('#qrM'),{text:url,width:220,height:220,correctLevel:QRCode.CorrectLevel.M}); }
+  else $('#qrM').innerHTML='<div class="empty">No se pudo cargar el generador de QR (revise la conexión).</div>';
+  $('#qrNo').onclick=cerrarModal;
+  $('#qrPrint').onclick=()=>{
+    $('#printWrap').innerHTML=`<div class="pcard"><img src="${LOGO_SRC}" alt="CMGA" style="width:300px;max-width:100%"><h1>¿Cómo fue su atención?</h1><p>Su opinión nos ayuda a mejorar.</p><p>Escanee el código con la cámara de su celular.</p><div class="pq" id="qrP"></div><p class="pf">Encuesta anónima · 3 minutos</p></div>`;
+    new QRCode(document.getElementById('qrP'),{text:url,width:260,height:260,correctLevel:QRCode.CorrectLevel.M});
+    setTimeout(()=>window.print(),300);
+  };
+};
+
+/* ===================== INICIO ===================== */
+render(); actualizarPend(); flushPendientes();
+</script>
+</body>
+</html>
