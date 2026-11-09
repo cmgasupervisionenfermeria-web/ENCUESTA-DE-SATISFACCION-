@@ -120,6 +120,8 @@ details.area[open]{background:#fafbfd;border-radius:8px}
 .alert .seg select,.alert .seg input{padding:8px;font-size:14px}
 .com{border-bottom:1px solid var(--ln);padding:10px 0;font-size:14px}
 .com small{color:var(--mut)}
+.com .orig{margin-top:8px;background:#f3f6fa;border-left:3px solid var(--teal);border-radius:6px;padding:6px 10px;font-size:13px;color:var(--tx);line-height:1.5}
+.com .orig span{color:var(--mut);font-size:12px}
 .empty{color:var(--mut);font-size:14px;padding:8px 0}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .qrbox{display:flex;justify-content:center;margin:14px 0}
@@ -178,7 +180,7 @@ details.area[open]{background:#fafbfd;border-radius:8px}
   </div>
   <div class="card"><h3>Alertas para seguimiento</h3><p class="cs">Se genera alerta con cualquier calificación "Malo", un "No" en 8.1–8.5 o un incidente sin resolver (8.6). Turnar al jefe de área en ≤ 48 h.</p><div id="alertas"></div></div>
   <div class="grid2">
-    <div class="card"><h3>Comentarios y sugerencias</h3><div id="comentarios"></div></div>
+    <div class="card"><h3>Quejas y sugerencias</h3><div id="comentarios"></div></div>
     <div class="card"><h3>Reconocimientos</h3><div id="reconoc"></div></div>
   </div>
 </main>
@@ -323,7 +325,7 @@ function render(){
   } else if(p.id==='datos'){
     h = cab('Datos generales') + `<p class="sub">Nos ayudan a saber a qué área enviar sus comentarios.</p>
       <div class="q"><div class="qt">Servicio donde estuvo <span class="req">*</span></div>${textOps('servicio',SERVICIOS)}</div>
-      <div class="q"><div class="qt">Número de habitación (opcional)</div>${inputTxt('habitacion','Ej. 205')}</div>
+      <div class="q"><div class="qt">Número de habitación <span class="req">*</span></div>${inputTxt('habitacion','Ej. 205')}</div>
       <div class="q"><div class="qt">Días de estancia</div>${textOps('estancia',ESTANCIAS)}</div>
       <div class="q"><div class="qt">¿Quién responde la encuesta?</div>${textOps('responde',RESPONDE)}
         <div class="cond" id="c_respondeOtro" ${R.responde==='Otro'?'':'hidden'}>${inputTxt('respondeOtro','Especifique')}</div></div>
@@ -345,8 +347,8 @@ function render(){
       <div class="q"><div class="qt">Si necesitara atención hospitalaria de nuevo, ¿regresaría a CMGA?</div>${textOps('regresaria',['Sí','Tal vez','No'])}</div>
       <div class="q"><div class="qt">¿Qué área o persona le gustaría reconocer y por qué? (opcional)</div>${areaTxt('reconocimiento','Escriba aquí')}</div>`;
   } else if(p.id==='coment'){
-    h = cab('💬 Comentarios y sugerencias')
-      + `<div class="q"><div class="qt">¿Qué podemos mejorar?</div>${areaTxt('comentarios','Escriba aquí sus comentarios o sugerencias (opcional)')}</div>
+    h = cab('💬 Quejas y sugerencias')
+      + `<div class="q"><div class="qt">¿Tiene alguna queja o sugerencia? ¿Qué podemos mejorar?</div>${areaTxt('comentarios','Escriba aquí su queja o sugerencia (opcional)')}</div>
       <div class="q"><div class="qt">¿Desea que nos comuniquemos con usted sobre su experiencia?</div>${textOps('contacto',['Sí','No'])}
         <div class="cond" id="c_contacto" ${R.contacto==='Sí'?'':'hidden'}>
           <div style="display:grid;gap:8px;margin-top:4px">${inputTxt('contactoNombre','Nombre')}${inputTxt('contactoTel','Teléfono','tel')}</div>
@@ -395,6 +397,7 @@ document.addEventListener('input',e=>{
 function siguiente(){
   const p = PASOS[paso];
   if(p.id==='datos' && !R.servicio){ toast('Por favor seleccione el servicio donde estuvo'); return; }
+  if(p.id==='datos' && !(R.habitacion||'').trim()){ toast('Por favor escriba el número de habitación'); const i=document.querySelector('#wizard input[data-k="habitacion"]'); if(i) i.focus(); return; }
   if(p.id==='coment'){ enviar(); return; }
   paso++; render();
 }
@@ -590,10 +593,16 @@ function renderPanel(){
     </div>`;}).join('') : '<div class="empty">Sin alertas en el periodo. 👍</div>';
 
   // Comentarios / reconocimientos
+  const origen = f => {
+    const quien = f.responde==='Otro' ? (f.respondeOtro||'Otro') : (f.responde||'');
+    const lin1 = [f.habitacion?`<b>Hab. ${esc(f.habitacion)}</b>`:'<b>Hab. no indicada</b>', esc(f.servicio||''), esc(f.fechaHora||f.fecha||'')].filter(Boolean).join(' · ');
+    const nombre = f.contactoNombre ? `${quien?esc(quien)+': ':''}<b>${esc(f.contactoNombre)}</b>${f.contactoTel?' · Tel. '+esc(f.contactoTel):''}` : (quien?`Respondió: ${esc(quien)} (sin nombre)`:'');
+    return `<div class="orig">${lin1}${nombre?`<br>${nombre}`:''}<br><span>Folio ${esc(f.folio)}</span></div>`;
+  };
   const com = F.filter(f=>f.comentarios||f.incidenteDesc).sort((a,b)=>(b.fechaHora||'').localeCompare(a.fechaHora||''));
-  $('#comentarios').innerHTML = com.length? com.map(f=>`<div class="com">${f.comentarios?esc(f.comentarios):''}${f.incidenteDesc?`<div><b>Incidente:</b> ${esc(f.incidenteDesc)}</div>`:''}<br><small>${esc(f.folio)} · ${esc(f.servicio||'')} · ${esc(f.fecha||'')}</small></div>`).join('') : '<div class="empty">Sin comentarios en el periodo.</div>';
+  $('#comentarios').innerHTML = com.length? com.map(f=>`<div class="com">${f.comentarios?`<div>${esc(f.comentarios)}</div>`:''}${f.incidenteDesc?`<div><b>Incidente:</b> ${esc(f.incidenteDesc)}</div>`:''}${origen(f)}</div>`).join('') : '<div class="empty">Sin quejas ni sugerencias en el periodo.</div>';
   const rec = F.filter(f=>f.reconocimiento||f.reconocimientoEnf).sort((a,b)=>(b.fechaHora||'').localeCompare(a.fechaHora||''));
-  $('#reconoc').innerHTML = rec.length? rec.map(f=>`<div class="com">${f.reconocimientoEnf?`<div><b>Enfermería:</b> ${esc(f.reconocimientoEnf)}</div>`:''}${f.reconocimiento?esc(f.reconocimiento):''}<br><small>${esc(f.folio)} · ${esc(f.servicio||'')} · ${esc(f.fecha||'')}</small></div>`).join('') : '<div class="empty">Sin reconocimientos en el periodo.</div>';
+  $('#reconoc').innerHTML = rec.length? rec.map(f=>`<div class="com">${f.reconocimientoEnf?`<div><b>Enfermería:</b> ${esc(f.reconocimientoEnf)}</div>`:''}${f.reconocimiento?`<div>${esc(f.reconocimiento)}</div>`:''}${origen(f)}</div>`).join('') : '<div class="empty">Sin reconocimientos en el periodo.</div>';
 }
 
 $('#alertas').addEventListener('click',async e=>{
