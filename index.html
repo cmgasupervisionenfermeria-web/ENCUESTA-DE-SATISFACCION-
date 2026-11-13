@@ -102,6 +102,8 @@ td{border-bottom:1px solid var(--ln);padding:8px 6px;vertical-align:middle}
 .legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;background:var(--c)}
 details.area{border-top:1px solid var(--ln);padding:6px 0}
 .arow{display:grid;grid-template-columns:minmax(150px,26%) 1fr 90px 90px 80px;gap:10px;align-items:center;font-size:14px}
+.grp{background:#eef3f8;color:var(--navy);border-radius:8px;padding:8px 10px;margin:14px 0 4px;font-size:14px}
+.grp span{color:var(--mut);font-size:12px;margin-left:6px}
 .arow.hd{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;border-bottom:2px solid var(--ln);padding:8px 6px}
 details.area summary{cursor:pointer;color:var(--navy);font-weight:600;padding:10px 6px;list-style:none}
 details.area summary::-webkit-details-marker{display:none}
@@ -263,18 +265,68 @@ const SEG = [
   ['s5','¿Se sintió seguro(a) y protegido(a) durante su estancia?'],
   ['s6','¿Tuvo algún problema o incidente que no fue resuelto?']
 ];
+/* ---------- Preguntas exclusivas de URGENCIAS (se usan cuando el servicio elegido es "Urgencias") ---------- */
+const AREAS_URG = [
+  {id:'urec',titulo:'Recepción de Urgencias',ico:'🚑',items:[
+    ['ur1','Tiempo de espera desde su llegada hasta ser recibido'],
+    ['ur2','Amabilidad y trato del personal de recepción'],
+    ['ur3','Tiempo para que le valoraran por primera vez (triage)'],
+    ['ur4','Claridad de la información sobre trámites, costos estimados y documentos requeridos'],
+    ['ur5','Le mantuvieron informado(a) mientras esperaba']]},
+  {id:'uenf',titulo:'Enfermería de Urgencias',ico:'🩺',items:[
+    ['ue1','El personal de enfermería se presentó y le llamó por su nombre'],
+    ['ue2','Amabilidad, respeto y trato digno'],
+    ['ue3','Rapidez para atenderle cuando lo necesitó'],
+    ['ue4','Le explicaron los procedimientos antes de realizarlos (canalización, curación, toma de muestras)'],
+    ['ue5','Atención oportuna de su dolor o molestias'],
+    ['ue6','Le explicaron qué medicamentos le administraban y para qué'],
+    ['ue7','Respeto a su privacidad e intimidad durante su atención']]},
+  {id:'umed',titulo:'Médicos de Urgencias',ico:'👨‍⚕️',items:[
+    ['um1','Tiempo de espera para ser atendido por el médico'],
+    ['um2','Le explicó su diagnóstico y tratamiento en palabras claras'],
+    ['um3','Resolvió sus dudas y las de su familia'],
+    ['um4','Le pidió su autorización (consentimiento) antes de procedimientos'],
+    ['um5','Le informó qué estudios le realizaron y sus resultados'],
+    ['um6','Le dio indicaciones claras para su egreso (medicamentos, signos de alarma, cuándo regresar)']]},
+  {id:'ulim',titulo:'Limpieza y confort',ico:'🧹',items:[
+    ['ul1','Limpieza de la sala de espera'],
+    ['ul2','Limpieza del cubículo o camilla donde le atendieron'],
+    ['ul3','Limpieza y abasto de los baños (papel, jabón, toallas)'],
+    ['ul4','Comodidad de la sala de espera (asientos, temperatura, ruido)'],
+    ['ul5','Amabilidad y discreción del personal de intendencia']]},
+  {id:'uegr',titulo:'Proceso de egreso de Urgencias',ico:'💳',items:[
+    ['uc1','Amabilidad y atención del personal de Cajas'],
+    ['uc2','Claridad en la explicación de su estado de cuenta'],
+    ['uc3','El cobro correspondió a lo que le informaron'],
+    ['uc4','Tiempo desde que le dieron de alta hasta que pudo salir de Urgencias'],
+    ['uc5','Apoyo con trámites de aseguradora o facturación']]}
+];
+const SEG_URG_TXT = {
+  s1:'¿Le colocaron un brazalete de identificación?',
+  s4:'¿Cuidaron que no se cayera (barandales de la camilla, ayudarle al moverse)?',
+  s5:'¿Se sintió seguro(a) y protegido(a) durante su atención en Urgencias?'
+};
+const ESTANCIAS_URG = ['Menos de 2 horas','2 a 4 horas','4 a 6 horas','6 a 12 horas','Más de 12 horas'];
+const DESTINOS_URG = ['Alta a su domicilio','Pasó a hospitalización','Traslado a otro hospital'];
+const esUrg = s => s==='Urgencias';
+const areasDe = serv => esUrg(serv) ? AREAS_URG : AREAS;
+const TODAS_AREAS = AREAS.concat(AREAS_URG);
 const GLOBAL = [['g1','Calificación general de la atención en CMGA'],['g2','Relación entre la calidad del servicio y el costo']];
 const SERVICIOS = ['Hospitalización','Terapia Intermedia','Terapia Intensiva','Urgencias','Imagen'];
 const ESTANCIAS = ['1 día','2 a 3 días','4 a 7 días','Más de 7 días'];
 const RESPONDE = ['Paciente','Familiar','Otro'];
 const ETIQ = {};
 AREAS.forEach(a=>a.items.forEach(([k,t])=>ETIQ[k]=a.titulo+': '+t));
+AREAS_URG.forEach(a=>a.items.forEach(([k,t])=>ETIQ[k]=a.titulo+': '+t));
 SEG.forEach(([k,t])=>ETIQ[k]='Seguridad: '+t);
 GLOBAL.forEach(([k,t])=>ETIQ[k]='Global: '+t);
 
-const PASOS = [{id:'inicio'},{id:'datos',titulo:'Datos generales'}]
-  .concat(AREAS.map(a=>({id:a.id,titulo:a.titulo,area:a})))
-  .concat([{id:'seg',titulo:'Seguridad y trato digno'},{id:'global',titulo:'Evaluación global'},{id:'coment',titulo:'Comentarios'},{id:'fin'}]);
+/* Los pasos dependen del servicio elegido: Urgencias tiene sus propias secciones */
+function pasos(){
+  return [{id:'inicio'},{id:'datos',titulo:'Datos generales'}]
+    .concat(areasDe(R.servicio).map(a=>({id:a.id,titulo:a.titulo,area:a})))
+    .concat([{id:'seg',titulo:'Seguridad y trato digno'},{id:'global',titulo:'Evaluación global'},{id:'coment',titulo:'Quejas y sugerencias'},{id:'fin'}]);
+}
 
 /* ===================== UTILIDADES ===================== */
 const $ = s=>document.querySelector(s);
@@ -308,9 +360,9 @@ function inputTxt(k,ph,tipo='text'){return `<input type="${tipo}" data-k="${k}" 
 function areaTxt(k,ph){return `<textarea data-k="${k}" placeholder="${esc(ph)}" maxlength="1000">${esc(R[k]||'')}</textarea>`;}
 
 function render(){
-  const p = PASOS[paso], w = $('#wizard');
-  const total = PASOS.length-2;
-  $('#bar').style.width = (paso<=0?0:Math.min(100,(paso/(PASOS.length-1))*100))+'%';
+  const p = pasos()[paso], w = $('#wizard');
+  const total = pasos().length-2;
+  $('#bar').style.width = (paso<=0?0:Math.min(100,(paso/(pasos().length-1))*100))+'%';
   $('#navBtns').hidden = (p.id==='inicio'||p.id==='fin');
   $('#btnSig').textContent = p.id==='coment' ? 'Enviar encuesta ✓' : 'Siguiente →';
   let h = '';
@@ -325,8 +377,8 @@ function render(){
   } else if(p.id==='datos'){
     h = cab('Datos generales') + `<p class="sub">Nos ayudan a saber a qué área enviar sus comentarios.</p>
       <div class="q"><div class="qt">Servicio donde estuvo <span class="req">*</span></div>${textOps('servicio',SERVICIOS)}</div>
-      <div class="q"><div class="qt">Número de habitación <span class="req">*</span></div>${inputTxt('habitacion','Ej. 205')}</div>
-      <div class="q"><div class="qt">Días de estancia</div>${textOps('estancia',ESTANCIAS)}</div>
+      <div class="q"><div class="qt">${esUrg(R.servicio)?'Cubículo o cama donde le atendieron':'Número de habitación'} <span class="req">*</span></div>${inputTxt('habitacion',esUrg(R.servicio)?'Ej. Cubículo 3':'Ej. 205')}</div>
+      <div class="q"><div class="qt">${esUrg(R.servicio)?'Tiempo que estuvo en Urgencias':'Días de estancia'}</div>${textOps('estancia',esUrg(R.servicio)?ESTANCIAS_URG:ESTANCIAS)}</div>
       <div class="q"><div class="qt">¿Quién responde la encuesta?</div>${textOps('responde',RESPONDE)}
         <div class="cond" id="c_respondeOtro" ${R.responde==='Otro'?'':'hidden'}>${inputTxt('respondeOtro','Especifique')}</div></div>
       <div class="q"><div class="qt">¿Es su primera vez en CMGA?</div>${textOps('primeraVez',['Sí','No'])}</div>`;
@@ -335,16 +387,17 @@ function render(){
     h = cab(a.ico+' '+a.titulo) + `<p class="sub">¿Cómo califica lo siguiente? Si no aplica a su caso, elija "No aplica".</p>`
       + (a.skip?`<button class="skip" data-act="skip" data-a="${a.id}">${esc(a.skip)} → marcar todo "No aplica" y continuar</button>`:'')
       + a.items.map(([k,t])=>rating(k,t)).join('');
-    if(a.id==='enf') h += `<div class="q"><div class="qt">¿Desea reconocer a alguna enfermera o enfermero? (opcional)</div>${inputTxt('reconocimientoEnf','Nombre')}</div>`;
+    if(a.id==='enf'||a.id==='uenf') h += `<div class="q"><div class="qt">¿Desea reconocer a alguna enfermera o enfermero? (opcional)</div>${inputTxt('reconocimientoEnf','Nombre')}</div>`;
+    if(a.id==='uegr') h += `<div class="q"><div class="qt">¿Cómo terminó su atención en Urgencias?</div>${textOps('destinoUrg',DESTINOS_URG)}</div>`;
   } else if(p.id==='seg'){
     h = cab('🛡️ Seguridad y trato digno') + `<p class="sub">Responda Sí o No según lo que recuerde.</p>`
-      + SEG.map(([k,t])=>`<div class="q" id="q_${k}"><div class="qt">${esc(t)}</div><div class="opts">${['Sí','No','No recuerdo'].map(v=>opBtn(k,{v,t:v,c:'g'},'txt')).join('')}</div>${k==='s6'?`<div class="cond" id="c_incidenteDesc" ${R.s6==='Sí'?'':'hidden'}>${areaTxt('incidenteDesc','Descríbalo brevemente para poder atenderlo')}</div>`:''}</div>`).join('');
+      + SEG.map(([k,t])=>`<div class="q" id="q_${k}"><div class="qt">${esc(esUrg(R.servicio)&&SEG_URG_TXT[k]?SEG_URG_TXT[k]:t)}</div><div class="opts">${['Sí','No','No recuerdo'].map(v=>opBtn(k,{v,t:v,c:'g'},'txt')).join('')}</div>${k==='s6'?`<div class="cond" id="c_incidenteDesc" ${R.s6==='Sí'?'':'hidden'}>${areaTxt('incidenteDesc','Descríbalo brevemente para poder atenderlo')}</div>`:''}</div>`).join('');
   } else if(p.id==='global'){
     const nps = [...Array(11).keys()].map(n=>{const c=n<=6?'lo':(n<=8?'mid':'hi');return `<button type="button" class="op ${c}${R.nps===String(n)?' sel':''}" data-k="nps" data-v="${n}">${n}</button>`;}).join('');
     h = cab('⭐ Evaluación global')
       + GLOBAL.map(([k,t])=>rating(k,t,false)).join('')
       + `<div class="q"><div class="qt">Del 0 al 10, ¿qué tan probable es que recomiende CMGA a un familiar o amigo?</div><div class="nps">${nps}</div><div class="npsl"><span>0 = Nada probable</span><span>10 = Muy probable</span></div></div>
-      <div class="q"><div class="qt">Si necesitara atención hospitalaria de nuevo, ¿regresaría a CMGA?</div>${textOps('regresaria',['Sí','Tal vez','No'])}</div>
+      <div class="q"><div class="qt">${esUrg(R.servicio)?'Si necesitara atención de urgencias de nuevo':'Si necesitara atención hospitalaria de nuevo'}, ¿regresaría a CMGA?</div>${textOps('regresaria',['Sí','Tal vez','No'])}</div>
       <div class="q"><div class="qt">¿Qué área o persona le gustaría reconocer y por qué? (opcional)</div>${areaTxt('reconocimiento','Escriba aquí')}</div>`;
   } else if(p.id==='coment'){
     h = cab('💬 Quejas y sugerencias')
@@ -374,19 +427,24 @@ document.addEventListener('click',e=>{
   const b = e.target.closest('#wizard .op');
   if(b){
     const k=b.dataset.k, v=b.dataset.v;
+    const urgAntes = esUrg(R.servicio);
     if(R[k]===v){ delete R[k]; b.classList.remove('sel'); }   // tocar de nuevo = desmarcar
     else{
       R[k]=v;
       b.parentElement.querySelectorAll('.op').forEach(x=>x.classList.toggle('sel',x===b));
     }
     actualizarCondicionales();
+    if(k==='servicio' && urgAntes!==esUrg(R.servicio)){   // cambian las preguntas: Urgencias ↔ hospitalización
+      delete R.estancia;
+      const y=window.scrollY; render(); window.scrollTo(0,y);
+    }
     return;
   }
   const a = e.target.closest('[data-act]');
   if(!a) return;
   const act = a.dataset.act;
   if(act==='comenzar'){ R={}; idCliente=nuevoId(); paso=1; render(); }
-  else if(act==='skip'){ const ar=AREAS.find(x=>x.id===a.dataset.a); ar.items.forEach(([k])=>R[k]='NA'); siguiente(); }
+  else if(act==='skip'){ const ar=TODAS_AREAS.find(x=>x.id===a.dataset.a); ar.items.forEach(([k])=>R[k]='NA'); siguiente(); }
   else if(act==='nueva'){ reiniciar(); }
 });
 document.addEventListener('input',e=>{
@@ -395,9 +453,9 @@ document.addEventListener('input',e=>{
 });
 
 function siguiente(){
-  const p = PASOS[paso];
+  const p = pasos()[paso];
   if(p.id==='datos' && !R.servicio){ toast('Por favor seleccione el servicio donde estuvo'); return; }
-  if(p.id==='datos' && !(R.habitacion||'').trim()){ toast('Por favor escriba el número de habitación'); const i=document.querySelector('#wizard input[data-k="habitacion"]'); if(i) i.focus(); return; }
+  if(p.id==='datos' && !(R.habitacion||'').trim()){ toast(esUrg(R.servicio)?'Por favor escriba el cubículo o cama donde le atendieron':'Por favor escriba el número de habitación'); const i=document.querySelector('#wizard input[data-k="habitacion"]'); if(i) i.focus(); return; }
   if(p.id==='coment'){ enviar(); return; }
   paso++; render();
 }
@@ -418,8 +476,12 @@ async function enviar(){
   if(datos.contacto!=='Sí'){ delete datos.contactoNombre; delete datos.contactoTel; }
   if(datos.responde!=='Otro') delete datos.respondeOtro;
   if(datos.s6!=='Sí') delete datos.incidenteDesc;
+  const validas = new Set(areasDe(datos.servicio).flatMap(a=>a.items.map(i=>i[0])));
+  TODAS_AREAS.forEach(a=>a.items.forEach(([k])=>{ if(!validas.has(k)) delete datos[k]; }));
+  if(!esUrg(datos.servicio)) delete datos.destinoUrg;
+  if(datos.estancia && !(esUrg(datos.servicio)?ESTANCIAS_URG:ESTANCIAS).includes(datos.estancia)) delete datos.estancia;
   datos.motivosAlerta = motivosAlerta(datos).join(' | ');
-  datos.version = '1';
+  datos.version = '2';
   const payload = {action:'guardar', idCliente, datos};
   let folio = null;
   try{ const r = await api(payload); folio = r.folio; }
@@ -427,7 +489,7 @@ async function enviar(){
     const pend = lsGet(LS_PEND,[]); pend.push(payload); lsSet(LS_PEND,pend); actualizarPend();
   }
   btn.disabled=false;
-  paso = PASOS.length-1; render();
+  paso = pasos().length-1; render();
   $('#finFolio').textContent = folio ? ('Folio: '+folio) : 'Su encuesta quedó guardada en este equipo y se enviará en cuanto haya conexión.';
   let s = RESET_SEG;
   const tick=()=>{ const el=$('#finCuenta'); if(!el) return; el.textContent='La pantalla se reiniciará en '+s+' s'; if(s--<=0) reiniciar(); else resetT=setTimeout(tick,1000); };
@@ -455,7 +517,7 @@ setInterval(flushPendientes,60000);
 let ultimoToque = Date.now(), inactT=null;
 ['pointerdown','keydown','input'].forEach(ev=>document.addEventListener(ev,()=>{ultimoToque=Date.now();},true));
 setInterval(()=>{
-  const p=PASOS[paso];
+  const p=pasos()[paso];
   if(!$('#vEncuesta').hidden && p.id!=='inicio' && p.id!=='fin' && $('#ov').hidden && Date.now()-ultimoToque > INACTIVIDAD_MIN*60000){
     let s=30;
     abrirModal(`<h3>¿Sigue contestando?</h3><p>La encuesta se reiniciará en <b id="inS">30</b> s por inactividad.</p><div class="mrow"><button class="btn pri" id="inSi">Sí, continuar</button></div>`);
@@ -481,7 +543,7 @@ $('#lnkPanel').onclick = e=>{
   };
   $('#pinOk').onclick=ok; $('#pinNo').onclick=cerrarModal;
   $('#pinIn').addEventListener('keydown',ev=>{if(ev.key==='Enter')ok();});
-  setTimeout(()=>$('#pinIn').focus(),50);
+  setTimeout(()=>{const i=$('#pinIn'); if(i) i.focus();},50);
 };
 $('#btnSalir').onclick=()=>{ PIN=null; FILAS=[]; $('#vPanel').hidden=true; $('#vEncuesta').hidden=false; $('#subTop').textContent='Encuesta de satisfacción al egreso'; reiniciar(); };
 
@@ -515,7 +577,7 @@ function contar(filas,keys){
 const pct = x => x==null ? '—' : (Math.round(x*10)/10).toFixed(1)+' %';
 const cls = x => x==null ? 'nt' : (x>=META?'ok':(x>=80?'warn':'bad'));
 const colorSat = x => x==null ? 'var(--na)' : (x>=META?'var(--e)':(x>=80?'var(--r)':'var(--m)'));
-const TODAS_KEYS = AREAS.flatMap(a=>a.items.map(i=>i[0]));
+const TODAS_KEYS = TODAS_AREAS.flatMap(a=>a.items.map(i=>i[0]));
 
 function stk(c){
   const t=c.E+c.B+c.R+c.M; if(!t) return '<span class="tag nt">Sin respuestas</span>';
@@ -541,7 +603,7 @@ function renderPanel(){
 
   // Áreas
   const leg = `<div class="legend"><span style="--c:var(--e)">Excelente</span><span style="--c:var(--b)">Bueno</span><span style="--c:var(--r)">Regular</span><span style="--c:var(--m)">Malo</span></div>`;
-  const filasA = AREAS.map(a=>{
+  const filaArea = a=>{
     const s = contar(F,a.items.map(i=>i[0]));
     const det = a.items.map(([k,t])=>{const si=contar(F,[k]);return `<tr><td>${esc(t)}</td><td style="width:40%">${stk(si.c)}</td><td><span class="tag ${cls(si.sat)}">${pct(si.sat)}</span></td><td>${si.c.NA||0}</td></tr>`;}).join('');
     return `<details class="area"><summary class="arow">
@@ -551,8 +613,15 @@ function renderPanel(){
         <span>${s.prom==null?'—':s.prom.toFixed(2)} / 4</span>
         <span class="nn">${s.val} resp.</span></summary>
         <div style="padding:0 6px 10px">${leg}<table><tr><th>Pregunta</th><th>Distribución</th><th>Satisf.</th><th>N/A</th></tr>${det}</table></div></details>`;
-  }).join('');
-  $('#tblAreas').innerHTML = `<div class="arow hd"><span>Área</span><span class="bc">Satisfacción</span><span>%</span><span>Puntaje</span><span class="nn">n</span></div>`+filasA;
+  };
+  const fs = $('#fServ').value;
+  const verHosp = !esUrg(fs), verUrg = !fs || esUrg(fs);
+  const nHosp = F.filter(f=>!esUrg(f.servicio)).length, FU = F.filter(f=>esUrg(f.servicio));
+  const dest = DESTINOS_URG.map(d=>`${d}: <b>${FU.filter(f=>f.destinoUrg===d).length}</b>`).join(' · ');
+  const cabG = (t,n,extra='') => `<div class="grp"><b>${t}</b> <span>${n} encuesta(s)</span>${extra?`<div class="hint" style="margin-top:4px">${extra}</div>`:''}</div>`;
+  $('#tblAreas').innerHTML = `<div class="arow hd"><span>Área</span><span class="bc">Satisfacción</span><span>%</span><span>Puntaje</span><span class="nn">n</span></div>`
+    + (verHosp ? (fs?'':cabG('🏥 Hospitalización, Terapias e Imagen',nHosp)) + AREAS.map(filaArea).join('') : '')
+    + (verUrg ? cabG('🚑 Urgencias',FU.length,FU.length?'Cómo terminó la atención — '+dest:'') + AREAS_URG.map(filaArea).join('') : '');
 
   // Seguridad
   $('#tblSeg').innerHTML = `<table><tr><th>Pregunta</th><th>Sí</th><th>n</th></tr>`+SEG.map(([k,t])=>{
@@ -582,7 +651,7 @@ function renderPanel(){
     const est=f.estadoSeguimiento||'Pendiente', c=est==='Atendida'?'at':(est==='En seguimiento'?'sg':'');
     const contacto = f.contacto==='Sí' ? `<div class="hint">Contacto: ${esc(f.contactoNombre||'')} ${esc(f.contactoTel||'')}</div>`:'';
     return `<div class="alert ${c}" data-folio="${esc(f.folio)}">
-      <div class="h"><b>${esc(f.folio)} · ${esc(f.servicio||'')}${f.habitacion?' · Hab. '+esc(f.habitacion):''}</b><span class="hint">${esc(f.fechaHora||f.fecha||'')}</span></div>
+      <div class="h"><b>${esc(f.folio)} · ${esc(f.servicio||'')}${f.habitacion?(esUrg(f.servicio)?' · Cubículo ':' · Hab. ')+esc(f.habitacion):''}</b><span class="hint">${esc(f.fechaHora||f.fecha||'')}</span></div>
       <div class="mot">${esc(f.motivosAlerta||'Revisar respuestas').split(' | ').map(x=>'• '+x).join('<br>')}</div>
       ${f.comentarios?`<div class="hint">Comentario: “${esc(f.comentarios)}”</div>`:''}${contacto}
       <div class="seg" style="margin-top:8px">
@@ -595,7 +664,8 @@ function renderPanel(){
   // Comentarios / reconocimientos
   const origen = f => {
     const quien = f.responde==='Otro' ? (f.respondeOtro||'Otro') : (f.responde||'');
-    const lin1 = [f.habitacion?`<b>Hab. ${esc(f.habitacion)}</b>`:'<b>Hab. no indicada</b>', esc(f.servicio||''), esc(f.fechaHora||f.fecha||'')].filter(Boolean).join(' · ');
+    const lug = esUrg(f.servicio)?'Cubículo':'Hab.';
+    const lin1 = [f.habitacion?`<b>${lug} ${esc(f.habitacion)}</b>`:`<b>${lug} no indicado</b>`, esc(f.servicio||''), esc(f.fechaHora||f.fecha||'')].filter(Boolean).join(' · ');
     const nombre = f.contactoNombre ? `${quien?esc(quien)+': ':''}<b>${esc(f.contactoNombre)}</b>${f.contactoTel?' · Tel. '+esc(f.contactoTel):''}` : (quien?`Respondió: ${esc(quien)} (sin nombre)`:'');
     return `<div class="orig">${lin1}${nombre?`<br>${nombre}`:''}<br><span>Folio ${esc(f.folio)}</span></div>`;
   };
