@@ -177,10 +177,10 @@ details.area[open]{background:#fafbfd;border-radius:8px}
     <div id="tblAreas"></div>
   </div>
   <div class="grid2">
-    <div class="card"><h3>Seguridad y trato digno</h3><p class="cs">% de respuestas "Sí" (en 8.6, "Sí" es negativo: hubo un incidente sin resolver).</p><div id="tblSeg"></div></div>
+    <div class="card"><h3>Seguridad y trato digno</h3><p class="cs">% de respuestas "Sí" (en la pregunta de incidente no resuelto, "Sí" es negativo).</p><div id="tblSeg"></div></div>
     <div class="card"><h3>Tendencia mensual</h3><p class="cs">Satisfacción global por mes, últimos 12 meses (respeta el filtro de servicio).</p><div id="tendencia"></div></div>
   </div>
-  <div class="card"><h3>Alertas para seguimiento</h3><p class="cs">Se genera alerta con cualquier calificación "Malo", un "No" en 8.1–8.5 o un incidente sin resolver (8.6). Turnar al jefe de área en ≤ 48 h.</p><div id="alertas"></div></div>
+  <div class="card"><h3>Alertas para seguimiento</h3><p class="cs">Se genera alerta con cualquier calificación "Malo", un "No" en las preguntas de seguridad o un incidente sin resolver. Turnar al jefe de área en ≤ 48 h.</p><div id="alertas"></div></div>
   <div class="grid2">
     <div class="card"><h3>Quejas y sugerencias</h3><div id="comentarios"></div></div>
     <div class="card"><h3>Reconocimientos</h3><div id="reconoc"></div></div>
@@ -260,7 +260,6 @@ const AREAS = [
 const SEG = [
   ['s1','¿Le colocaron un brazalete de identificación al ingresar?'],
   ['s2','Antes de darle medicamentos o tomarle muestras, ¿confirmaron su nombre?'],
-  ['s3','¿Vio al personal lavarse las manos o usar gel antes de atenderle?'],
   ['s4','¿Le informaron cómo prevenir caídas (barandales, pedir ayuda para levantarse)?'],
   ['s5','¿Se sintió seguro(a) y protegido(a) durante su estancia?'],
   ['s6','¿Tuvo algún problema o incidente que no fue resuelto?']
