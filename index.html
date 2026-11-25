@@ -87,6 +87,21 @@ footer a{color:var(--mut)}
 .kpi .l{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px}
 .kpi .v{font-size:30px;font-weight:700;color:var(--navy);margin:6px 0 2px}
 .kpi .d{font-size:12px;color:var(--mut)}
+.kpi .dl{font-size:12px;margin-top:6px;font-weight:700}
+.up{color:var(--e)}.down{color:var(--m)}.eq{color:var(--mut)}
+.dl small{font-weight:400;color:var(--mut)}
+.wnav{display:flex;align-items:flex-end;gap:6px}
+.wnav .btn{padding:8px 12px}
+#repTitulo{background:var(--navy);color:#fff;border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline}
+#repTitulo b{font-size:18px}#repTitulo span{opacity:.85;font-size:14px}
+.resumen{margin:0;padding-left:18px;font-size:14px;line-height:1.7}
+.dias{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:12px}
+.dias div{background:#f3f6fa;border-radius:8px;text-align:center;padding:6px 2px;font-size:12px;color:var(--mut)}
+.dias b{display:block;font-size:18px;color:var(--navy)}
+.crit td:first-child{width:46%}
+.grid2>*{min-width:0}
+.card{min-width:0;overflow-x:auto}
+@media (max-width:560px){.dias{gap:3px}.dias b{font-size:15px}.kpis{grid-template-columns:1fr 1fr}.kpi .v{font-size:24px}.card table{font-size:12px}.stk{min-width:90px}}
 .kpi.ok{border-top-color:var(--e)}.kpi.warn{border-top-color:var(--r)}.kpi.bad{border-top-color:var(--m)}
 .card{background:#fff;border:1px solid var(--ln);border-radius:12px;padding:16px;margin-bottom:16px}
 .card h3{margin:0 0 4px;color:var(--navy);font-size:18px}
@@ -101,7 +116,7 @@ td{border-bottom:1px solid var(--ln);padding:8px 6px;vertical-align:middle}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-bottom:8px}
 .legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;background:var(--c)}
 details.area{border-top:1px solid var(--ln);padding:6px 0}
-.arow{display:grid;grid-template-columns:minmax(150px,26%) 1fr 90px 90px 80px;gap:10px;align-items:center;font-size:14px}
+.arow{display:grid;grid-template-columns:minmax(150px,24%) 1fr 84px 84px 84px 70px;gap:10px;align-items:center;font-size:14px}
 .grp{background:#eef3f8;color:var(--navy);border-radius:8px;padding:8px 10px;margin:14px 0 4px;font-size:14px}
 .grp span{color:var(--mut);font-size:12px;margin-left:6px}
 .arow.hd{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;border-bottom:2px solid var(--ln);padding:8px 6px}
@@ -110,7 +125,7 @@ details.area summary::-webkit-details-marker{display:none}
 details.area summary .nm::before{content:"▸ ";color:var(--mut)}
 details.area[open] summary .nm::before{content:"▾ "}
 details.area[open]{background:#fafbfd;border-radius:8px}
-@media (max-width:760px){.arow{grid-template-columns:1fr 70px 60px}.arow .bc,.arow .nn{display:none}}
+@media (max-width:760px){.arow{grid-template-columns:1fr 70px 70px}.arow .bc,.arow .nn,.arow .pt{display:none}.wnav{width:100%}}
 .tag{display:inline-block;padding:3px 8px;border-radius:10px;font-size:12px;font-weight:700}
 .tag.ok{background:#e3f2ec;color:var(--e)}.tag.warn{background:#fbf0d9;color:#9a6a0c}.tag.bad{background:#f8e1df;color:var(--m)}.tag.nt{background:#eef2f6;color:var(--mut)}
 .alert{border:1px solid var(--ln);border-left:5px solid var(--m);border-radius:10px;padding:12px;margin-bottom:10px}
@@ -129,8 +144,25 @@ details.area[open]{background:#fafbfd;border-radius:8px}
 .qrbox{display:flex;justify-content:center;margin:14px 0}
 #printWrap{display:none}
 @media (max-width:760px){.grid2{grid-template-columns:1fr}.alert .seg{grid-template-columns:1fr}.op{min-width:72px;font-size:13px}.op .f{font-size:22px}.hero h1{font-size:26px}}
+@page{size:letter;margin:10mm}
 @media print{
-  body>*{display:none!important}
+  body.printPanel>*:not(header):not(#vPanel){display:none!important}
+  body.printPanel .toolbar,body.printPanel .alert .seg,body.printPanel #btnTodo{display:none!important}
+  body.printPanel .card,body.printPanel .kpi{break-inside:avoid;box-shadow:none}
+  body.printPanel #vPanel{max-width:none;padding:0;zoom:.82}
+  body.printPanel .grid2{grid-template-columns:1fr 1fr!important}
+  body.printPanel .kpis{grid-template-columns:repeat(6,1fr)!important;gap:6px}
+  body.printPanel .kpi{padding:8px}body.printPanel .kpi .v{font-size:22px}
+  body.printPanel .arow{grid-template-columns:minmax(140px,26%) 1fr 70px 70px 70px 64px!important}
+  body.printPanel .arow .bc,body.printPanel .arow .nn,body.printPanel .arow .pt{display:block!important}
+  body.printPanel details.vacia{display:none}
+  body.printPanel details.area summary .nm::before{content:""}
+  body.printPanel .card{padding:10px 12px;margin-bottom:10px}
+  body.printPanel header.top{padding:4px 0;border-bottom-width:3px}
+  body.printPanel #repTitulo{margin-bottom:10px}
+  body.printPanel .card table{font-size:12px}
+  html:has(body.printPanel),body.printPanel,body.printPanel #vPanel{background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body:not(.printPanel)>*{display:none!important}
   #printWrap{display:flex!important;justify-content:center;align-items:center;min-height:95vh}
   .pcard{border:3px solid #1B3A6B;border-radius:18px;padding:36px 40px;text-align:center;width:420px;font-family:Arial}
   .pcard .pl{background:#1B3A6B;color:#fff;font-weight:700;padding:8px 14px;border-radius:8px;display:inline-block}
@@ -161,26 +193,35 @@ details.area[open]{background:#fafbfd;border-radius:8px}
 <!-- ============ PANEL ============ -->
 <main id="vPanel" hidden>
   <div class="toolbar">
+    <label>Revisar por<select id="fModo"><option value="semana">Semana</option><option value="mes">Mes</option><option value="rango">Fechas personalizadas</option></select></label>
+    <div class="wnav"><button class="btn sec sm" id="btnPrev" title="Periodo anterior">◀</button><button class="btn sec sm" id="btnHoy">Actual</button><button class="btn sec sm" id="btnNext" title="Periodo siguiente">▶</button></div>
     <label>Desde<input type="date" id="fDesde"></label>
     <label>Hasta<input type="date" id="fHasta"></label>
     <label>Servicio<select id="fServ"></select></label>
     <button class="btn nav sm" id="btnRecargar">↻ Actualizar</button>
     <div class="sp"></div>
+    <button class="btn sec sm" id="btnPrint">🖨 Imprimir reporte</button>
     <button class="btn sec sm" id="btnCSV">⬇ CSV</button>
     <button class="btn sec sm" id="btnQR">▣ Código QR</button>
     <button class="btn sec sm" id="btnSalir">Salir</button>
   </div>
+  <div id="repTitulo"></div>
   <div class="kpis" id="kpis"></div>
+  <div class="grid2">
+    <div class="card"><h3>Resumen del periodo</h3><p class="cs" id="resSub"></p><div id="resumen"></div></div>
+    <div class="card"><h3>Por servicio</h3><p class="cs">Satisfacción global de cada servicio y cambio contra el periodo anterior.</p><div id="tblServ"></div></div>
+  </div>
+  <div class="card"><h3>Preguntas a atender</h3><p class="cs">Preguntas por debajo de la meta (90 %) en el periodo, de la más baja a la más alta. Son los puntos a revisar con cada jefe de área.</p><div id="criticas"></div></div>
   <div class="card">
     <h3>Satisfacción por área</h3>
-    <p class="cs">% de respuestas Excelente + Bueno sobre respuestas válidas (sin N/A). Meta: ≥ 90 %. Haga clic en un área para ver cada pregunta.</p>
+    <p class="cs">% de respuestas Excelente + Bueno sobre respuestas válidas (sin N/A). Meta: ≥ 90 %. "vs ant." = cambio en puntos contra el periodo anterior. Haga clic en un área para ver cada pregunta.</p>
     <div id="tblAreas"></div>
   </div>
   <div class="grid2">
     <div class="card"><h3>Seguridad y trato digno</h3><p class="cs">% de respuestas "Sí" (en la pregunta de incidente no resuelto, "Sí" es negativo).</p><div id="tblSeg"></div></div>
-    <div class="card"><h3>Tendencia mensual</h3><p class="cs">Satisfacción global por mes, últimos 12 meses (respeta el filtro de servicio).</p><div id="tendencia"></div></div>
+    <div class="card"><h3 id="tendTit">Tendencia</h3><p class="cs" id="tendSub"></p><div id="tendencia"></div></div>
   </div>
-  <div class="card"><h3>Alertas para seguimiento</h3><p class="cs">Se genera alerta con cualquier calificación "Malo", un "No" en las preguntas de seguridad o un incidente sin resolver. Turnar al jefe de área en ≤ 48 h.</p><div id="alertas"></div></div>
+  <div class="card"><h3>Alertas para seguimiento</h3><p class="cs">Se genera alerta con cualquier calificación "Malo", un "No" en las preguntas de seguridad o un incidente sin resolver. Turnar al jefe de área en ≤ 48 h. También se muestran las alertas de periodos anteriores que siguen sin marcarse como atendidas.</p><div id="alertas"></div></div>
   <div class="grid2">
     <div class="card"><h3>Quejas y sugerencias</h3><div id="comentarios"></div></div>
     <div class="card"><h3>Reconocimientos</h3><div id="reconoc"></div></div>
@@ -546,12 +587,43 @@ $('#lnkPanel').onclick = e=>{
 };
 $('#btnSalir').onclick=()=>{ PIN=null; FILAS=[]; $('#vPanel').hidden=true; $('#vEncuesta').hidden=false; $('#subTop').textContent='Encuesta de satisfacción al egreso'; reiniciar(); };
 
+/* ---------- Periodos de revisión (semana lunes–domingo, mes o rango libre) ---------- */
+const MESES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const DIAS=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+const pf = s => { const [a,m,d]=String(s).split('-').map(Number); return new Date(a,m-1,d); };
+const addDias = (d,n) => { const x=new Date(d); x.setDate(x.getDate()+n); return x; };
+const lunesDe = d => { const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); return addDias(x,-((x.getDay()+6)%7)); };
+const fCorta = d => d.getDate()+' '+MESES[d.getMonth()];
+const fLarga = d => d.getDate()+' '+MESES[d.getMonth()]+' '+d.getFullYear();
+function fijarPeriodo(modo, ref){
+  if(modo==='semana'){ const l=lunesDe(ref); $('#fDesde').value=hoyStr(l); $('#fHasta').value=hoyStr(addDias(l,6)); }
+  else if(modo==='mes'){ $('#fDesde').value=hoyStr(new Date(ref.getFullYear(),ref.getMonth(),1)); $('#fHasta').value=hoyStr(new Date(ref.getFullYear(),ref.getMonth()+1,0)); }
+}
+function periodoAnterior(){
+  const d=pf($('#fDesde').value), h=pf($('#fHasta').value), modo=$('#fModo').value;
+  if(modo==='mes'){ const a=new Date(d.getFullYear(),d.getMonth()-1,1); return [hoyStr(a), hoyStr(new Date(a.getFullYear(),a.getMonth()+1,0))]; }
+  const largo=Math.round((h-d)/86400000)+1;
+  return [hoyStr(addDias(d,-largo)), hoyStr(addDias(d,-1))];
+}
+function moverPeriodo(dir){
+  const modo=$('#fModo').value, d=pf($('#fDesde').value);
+  if(modo==='semana') fijarPeriodo('semana', addDias(d,7*dir));
+  else if(modo==='mes') fijarPeriodo('mes', new Date(d.getFullYear(),d.getMonth()+dir,1));
+  else { const h=pf($('#fHasta').value), largo=Math.round((h-d)/86400000)+1; $('#fDesde').value=hoyStr(addDias(d,largo*dir)); $('#fHasta').value=hoyStr(addDias(h,largo*dir)); }
+  renderPanel();
+}
+function nombrePeriodo(){
+  const modo=$('#fModo').value, d=pf($('#fDesde').value), h=pf($('#fHasta').value);
+  if(modo==='semana') return 'Semana del '+fCorta(d)+' al '+fLarga(h);
+  if(modo==='mes'){ const t=d.toLocaleDateString('es-MX',{month:'long',year:'numeric'}); return t.charAt(0).toUpperCase()+t.slice(1); }
+  return 'Del '+fLarga(d)+' al '+fLarga(h);
+}
+const nomAnt = () => ({semana:'semana anterior',mes:'mes anterior',rango:'periodo anterior'})[$('#fModo').value];
+
 function abrirPanel(){
   $('#vEncuesta').hidden=true; $('#navBtns').hidden=true; $('#vPanel').hidden=false;
   $('#subTop').textContent='Panel de resultados · Encuesta de satisfacción';
-  const h=new Date();
-  if(!$('#fDesde').value) $('#fDesde').value = hoyStr(new Date(h.getFullYear(),h.getMonth(),1));
-  if(!$('#fHasta').value) $('#fHasta').value = hoyStr(h);
+  if(!$('#fDesde').value){ $('#fModo').value='semana'; fijarPeriodo('semana', new Date()); }
   $('#fServ').innerHTML = '<option value="">Todos</option>'+SERVICIOS.map(s=>`<option>${esc(s)}</option>`).join('');
   cargarPanel();
 }
@@ -561,12 +633,22 @@ async function cargarPanel(){
   catch(err){ $('#kpis').innerHTML=`<div class="empty">No se pudieron cargar los resultados: ${esc(err.message)}</div>`; }
 }
 $('#btnRecargar').onclick=cargarPanel;
-['fDesde','fHasta','fServ'].forEach(id=>$('#'+id).addEventListener('change',()=>renderPanel()));
+$('#fServ').addEventListener('change',()=>renderPanel());
+['fDesde','fHasta'].forEach(id=>$('#'+id).addEventListener('change',()=>{
+  $('#fModo').value='rango';
+  if($('#fDesde').value && $('#fHasta').value && $('#fDesde').value>$('#fHasta').value) $('#fHasta').value=$('#fDesde').value;
+  renderPanel();
+}));
+$('#fModo').addEventListener('change',()=>{ const m=$('#fModo').value; if(m!=='rango') fijarPeriodo(m, new Date()); renderPanel(); });
+$('#btnPrev').onclick=()=>moverPeriodo(-1);
+$('#btnNext').onclick=()=>moverPeriodo(1);
+$('#btnHoy').onclick=()=>{ const m=$('#fModo').value==='rango'?'semana':$('#fModo').value; $('#fModo').value=m; fijarPeriodo(m,new Date()); renderPanel(); };
 
-function filtradas(conFechas=true){
-  const d=$('#fDesde').value, h=$('#fHasta').value, s=$('#fServ').value;
-  return FILAS.filter(f=>(!s||f.servicio===s) && (!conFechas || ((!d||f.fecha>=d)&&(!h||f.fecha<=h))));
+function filtrar(d,h){
+  const s=$('#fServ').value;
+  return FILAS.filter(f=>(!s||f.servicio===s) && (!d||f.fecha>=d) && (!h||f.fecha<=h));
 }
+function filtradas(conFechas=true){ return conFechas ? filtrar($('#fDesde').value,$('#fHasta').value) : filtrar('',''); }
 function contar(filas,keys){
   const c={E:0,B:0,R:0,M:0,NA:0};
   filas.forEach(f=>keys.forEach(k=>{const v=f[k]; if(c[v]!==undefined) c[v]++;}));
@@ -583,42 +665,104 @@ function stk(c){
   return `<div class="stk" title="E ${c.E} · B ${c.B} · R ${c.R} · M ${c.M}">${['E','B','R','M'].map(v=>c[v]?`<i style="width:${c[v]/t*100}%;background:var(--${v.toLowerCase()})"></i>`:'').join('')}</div>`;
 }
 
+function indicadores(F){
+  const glob=contar(F,TODAS_KEYS), g1=contar(F,['g1']);
+  const npsV=F.map(f=>f.nps).filter(v=>v!==''&&v!=null).map(Number).filter(n=>!isNaN(n));
+  const nps=npsV.length?(npsV.filter(n=>n>=9).length-npsV.filter(n=>n<=6).length)/npsV.length*100:null;
+  const reg=F.filter(f=>f.regresaria), regSi=reg.length?reg.filter(f=>f.regresaria==='Sí').length/reg.length*100:null;
+  const al=F.filter(f=>f.alerta==='Sí');
+  return {n:F.length, glob, g1, nps, npsN:npsV.length, regSi, regN:reg.length, alertas:al.length,
+          pend:al.filter(f=>(f.estadoSeguimiento||'Pendiente')==='Pendiente').length,
+          seg:al.filter(f=>f.estadoSeguimiento==='En seguimiento').length,
+          atend:al.filter(f=>f.estadoSeguimiento==='Atendida').length,
+          quejas:F.filter(f=>f.comentarios||f.incidenteDesc).length,
+          recon:F.filter(f=>f.reconocimiento||f.reconocimientoEnf).length};
+}
+/* Flecha de cambio contra el periodo anterior. menosEsMejor = true para alertas. */
+function delta(act, ant, unidad, menosEsMejor){
+  if(act==null || ant==null) return `<span class="eq">— <small>sin dato ${nomAnt()}</small></span>`;
+  const df=Math.round((act-ant)*10)/10;
+  if(df===0) return `<span class="eq">= igual que ${nomAnt()}</span>`;
+  const bueno = menosEsMejor ? df<0 : df>0;
+  return `<span class="${bueno?'up':'down'}">${df>0?'▲ +':'▼ '}${unidad==='%'?df.toFixed(1)+' pts':df}</span> <small>vs ${nomAnt()}</small>`;
+}
+const deltaCorto = (act,ant) => { if(act==null||ant==null) return '<span class="eq">—</span>'; const df=Math.round((act-ant)*10)/10; return df===0?'<span class="eq">=</span>':`<span class="${df>0?'up':'down'}">${df>0?'▲ +':'▼ '}${df.toFixed(1)}</span>`; };
+
 function renderPanel(){
   const F = filtradas();
-  // KPIs
-  const glob = contar(F,TODAS_KEYS), g1=contar(F,['g1']);
-  const npsV = F.map(f=>f.nps).filter(v=>v!==''&&v!=null).map(Number).filter(n=>!isNaN(n));
-  const nps = npsV.length ? (npsV.filter(n=>n>=9).length - npsV.filter(n=>n<=6).length)/npsV.length*100 : null;
-  const reg = F.filter(f=>f.regresaria); const regSi = reg.length? reg.filter(f=>f.regresaria==='Sí').length/reg.length*100 : null;
-  const alertasPend = F.filter(f=>f.alerta==='Sí' && f.estadoSeguimiento!=='Atendida').length;
+  const [dA,hA] = periodoAnterior();
+  const FA = filtrar(dA,hA);
+  const I = indicadores(F), A = indicadores(FA);
+  const fsv = $('#fServ').value;
+  $('#repTitulo').innerHTML = `<b>${esc(nombrePeriodo())}</b><span>Servicio: ${esc(fsv||'Todos')}</span><span>Comparado con: ${fCorta(pf(dA))} – ${fLarga(pf(hA))}</span>`;
   $('#kpis').innerHTML = [
-    {l:'Encuestas',v:F.length,d:'en el periodo',c:''},
-    {l:'Satisfacción global',v:pct(glob.sat),d:glob.val+' respuestas válidas',c:cls(glob.sat)},
-    {l:'Calificación general',v:pct(g1.sat),d:'Excelente + Bueno (9.1)',c:cls(g1.sat)},
-    {l:'Índice de recomendación',v:nps==null?'—':Math.round(nps),d:npsV.length+' resp. · promotores − detractores',c:nps==null?'':(nps>=50?'ok':(nps>=0?'warn':'bad'))},
-    {l:'Regresaría a CMGA',v:pct(regSi),d:reg.length+' respuestas',c:cls(regSi)},
-    {l:'Alertas pendientes',v:alertasPend,d:'sin marcar como atendidas',c:alertasPend?'bad':'ok'}
-  ].map(k=>`<div class="kpi ${k.c}"><div class="l">${k.l}</div><div class="v">${k.v}</div><div class="d">${k.d}</div></div>`).join('');
+    {l:'Encuestas',v:I.n,d:'contestadas en el periodo',dl:delta(I.n,FA.length?A.n:0,'n'),c:''},
+    {l:'Satisfacción global',v:pct(I.glob.sat),d:I.glob.val+' respuestas válidas',dl:delta(I.glob.sat,A.glob.sat,'%'),c:cls(I.glob.sat)},
+    {l:'Calificación general',v:pct(I.g1.sat),d:'"Calificación general de la atención"',dl:delta(I.g1.sat,A.g1.sat,'%'),c:cls(I.g1.sat)},
+    {l:'Índice de recomendación',v:I.nps==null?'—':Math.round(I.nps),d:I.npsN+' resp. · promotores − detractores',dl:delta(I.nps==null?null:Math.round(I.nps),A.nps==null?null:Math.round(A.nps),'n'),c:I.nps==null?'':(I.nps>=50?'ok':(I.nps>=0?'warn':'bad'))},
+    {l:'Regresaría a CMGA',v:pct(I.regSi),d:I.regN+' respuestas',dl:delta(I.regSi,A.regSi,'%'),c:cls(I.regSi)},
+    {l:'Alertas del periodo',v:I.alertas,d:`${I.pend} pendientes · ${I.seg} en seguimiento · ${I.atend} atendidas`,dl:delta(I.alertas,FA.length?A.alertas:0,'n',true),c:I.pend?'bad':'ok'}
+  ].map(k=>`<div class="kpi ${k.c}"><div class="l">${k.l}</div><div class="v">${k.v}</div><div class="d">${k.d}</div><div class="dl">${k.dl}</div></div>`).join('');
+
+  // Resumen del periodo
+  const keysVis = (esUrg(fsv)?AREAS_URG:(fsv?AREAS:TODAS_AREAS)).flatMap(a=>a.items.map(i=>i[0]));
+  const porPreg = keysVis.map(k=>({k, ...contar(F,[k]), ant:contar(FA,[k]).sat})).filter(x=>x.val>0);
+  const baja = porPreg.slice().sort((a,b)=>a.sat-b.sat||b.val-a.val)[0];
+  const alta = porPreg.slice().sort((a,b)=>b.sat-a.sat||b.val-a.val)[0];
+  const porArea = (esUrg(fsv)?AREAS_URG:(fsv?AREAS:TODAS_AREAS)).map(a=>({a, s:contar(F,a.items.map(i=>i[0]))})).filter(x=>x.s.val>0);
+  const aBaja = porArea.slice().sort((x,y)=>x.s.sat-y.s.sat)[0], aAlta = porArea.slice().sort((x,y)=>y.s.sat-x.s.sat)[0];
+  const sinHab = F.filter(f=>!f.habitacion).length;
+  const cuentaDia=[0,0,0,0,0,0,0]; F.forEach(f=>{ if(f.fecha){ const d=pf(f.fecha); cuentaDia[(d.getDay()+6)%7]++; } });
+  $('#resSub').textContent = I.n ? `${I.n} encuesta(s) contestada(s).` : '';
+  $('#resumen').innerHTML = !I.n ? '<div class="empty">No hay encuestas en este periodo.</div>' : `<ul class="resumen">
+      <li>Satisfacción global: <b>${pct(I.glob.sat)}</b> ${I.glob.sat!=null&&I.glob.sat>=META?'(cumple la meta)':'(por debajo de la meta de 90 %)'}.</li>
+      ${aAlta?`<li>Área mejor evaluada: <b>${esc(aAlta.a.titulo)}</b> (${pct(aAlta.s.sat)}).</li>`:''}
+      ${aBaja&&aBaja!==aAlta?`<li>Área más baja: <b>${esc(aBaja.a.titulo)}</b> (${pct(aBaja.s.sat)}).</li>`:''}
+      ${baja&&baja.sat<META?`<li>Pregunta más baja: <b>${esc(ETIQ[baja.k])}</b> (${pct(baja.sat)}).</li>`:''}
+      ${alta?`<li>Pregunta mejor evaluada: <b>${esc(ETIQ[alta.k])}</b> (${pct(alta.sat)}).</li>`:''}
+      <li>Alertas: <b>${I.alertas}</b> (${I.pend} pendientes, ${I.seg} en seguimiento, ${I.atend} atendidas).</li>
+      <li>Quejas o sugerencias: <b>${I.quejas}</b> · Reconocimientos: <b>${I.recon}</b>.</li>
+      ${sinHab?`<li>${sinHab} encuesta(s) sin habitación o cubículo (capturadas antes de que fuera obligatorio).</li>`:''}
+    </ul>
+    <div class="hint" style="margin-top:10px">Encuestas por día de la semana:</div>
+    <div class="dias">${DIAS.map((d,i)=>`<div><b>${cuentaDia[i]}</b>${d}</div>`).join('')}</div>`;
+
+  // Por servicio
+  const servs = SERVICIOS.filter(sv=>!fsv||sv===fsv);
+  const filasServ = servs.map(sv=>{
+    const fa=F.filter(f=>f.servicio===sv), fb=FA.filter(f=>f.servicio===sv);
+    if(!fa.length && !fb.length) return '';
+    const ia=indicadores(fa), ib=indicadores(fb);
+    return `<tr><td>${esc(sv)}</td><td>${ia.n}</td><td><span class="tag ${cls(ia.glob.sat)}">${pct(ia.glob.sat)}</span></td><td>${deltaCorto(ia.glob.sat,ib.glob.sat)}</td><td>${ia.nps==null?'—':Math.round(ia.nps)}</td><td>${ia.alertas?`<span class="tag bad">${ia.alertas}</span>`:'0'}</td></tr>`;
+  }).join('');
+  $('#tblServ').innerHTML = filasServ ? `<table><tr><th>Servicio</th><th>Encuestas</th><th>Satisf.</th><th>vs ant.</th><th>Recom.</th><th>Alertas</th></tr>${filasServ}</table>` : '<div class="empty">Sin encuestas en este periodo ni en el anterior.</div>';
+
+  // Preguntas a atender
+  const crit = porPreg.filter(x=>x.sat<META).sort((a,b)=>a.sat-b.sat||b.val-a.val);
+  $('#criticas').innerHTML = !porPreg.length ? '<div class="empty">No hay respuestas en este periodo.</div>'
+    : !crit.length ? '<div class="empty">👍 Todas las preguntas con respuestas cumplen la meta de 90 % en este periodo.</div>'
+    : `<table class="crit"><tr><th>Pregunta</th><th>Distribución</th><th>Satisf.</th><th>Malo</th><th>vs ant.</th><th>n</th></tr>${crit.map(x=>`<tr><td>${esc(ETIQ[x.k])}</td><td>${stk(x.c)}</td><td><span class="tag ${cls(x.sat)}">${pct(x.sat)}</span></td><td>${x.c.M}</td><td>${deltaCorto(x.sat,x.ant)}</td><td>${x.val}</td></tr>`).join('')}</table>`;
 
   // Áreas
   const leg = `<div class="legend"><span style="--c:var(--e)">Excelente</span><span style="--c:var(--b)">Bueno</span><span style="--c:var(--r)">Regular</span><span style="--c:var(--m)">Malo</span></div>`;
   const filaArea = a=>{
-    const s = contar(F,a.items.map(i=>i[0]));
-    const det = a.items.map(([k,t])=>{const si=contar(F,[k]);return `<tr><td>${esc(t)}</td><td style="width:40%">${stk(si.c)}</td><td><span class="tag ${cls(si.sat)}">${pct(si.sat)}</span></td><td>${si.c.NA||0}</td></tr>`;}).join('');
-    return `<details class="area"><summary class="arow">
+    const s = contar(F,a.items.map(i=>i[0])), sa = contar(FA,a.items.map(i=>i[0]));
+    const det = a.items.map(([k,t])=>{const si=contar(F,[k]), sb=contar(FA,[k]);return `<tr><td>${esc(t)}</td><td style="width:34%">${stk(si.c)}</td><td><span class="tag ${cls(si.sat)}">${pct(si.sat)}</span></td><td>${deltaCorto(si.sat,sb.sat)}</td><td>${si.c.NA||0}</td></tr>`;}).join('');
+    return `<details class="area${s.val?'':' vacia'}"><summary class="arow">
         <span class="nm">${a.ico} ${esc(a.titulo)}</span>
         <span class="bc"><div class="barw"><i style="width:${s.sat||0}%;background:${colorSat(s.sat)}"></i></div></span>
         <span><span class="tag ${cls(s.sat)}">${pct(s.sat)}</span></span>
-        <span>${s.prom==null?'—':s.prom.toFixed(2)} / 4</span>
+        <span>${deltaCorto(s.sat,sa.sat)}</span>
+        <span class="pt">${s.prom==null?'—':s.prom.toFixed(2)} / 4</span>
         <span class="nn">${s.val} resp.</span></summary>
-        <div style="padding:0 6px 10px">${leg}<table><tr><th>Pregunta</th><th>Distribución</th><th>Satisf.</th><th>N/A</th></tr>${det}</table></div></details>`;
+        <div style="padding:0 6px 10px">${leg}<table><tr><th>Pregunta</th><th>Distribución</th><th>Satisf.</th><th>vs ant.</th><th>N/A</th></tr>${det}</table></div></details>`;
   };
   const fs = $('#fServ').value;
   const verHosp = !esUrg(fs), verUrg = !fs || esUrg(fs);
   const nHosp = F.filter(f=>!esUrg(f.servicio)).length, FU = F.filter(f=>esUrg(f.servicio));
   const dest = DESTINOS_URG.map(d=>`${d}: <b>${FU.filter(f=>f.destinoUrg===d).length}</b>`).join(' · ');
   const cabG = (t,n,extra='') => `<div class="grp"><b>${t}</b> <span>${n} encuesta(s)</span>${extra?`<div class="hint" style="margin-top:4px">${extra}</div>`:''}</div>`;
-  $('#tblAreas').innerHTML = `<div class="arow hd"><span>Área</span><span class="bc">Satisfacción</span><span>%</span><span>Puntaje</span><span class="nn">n</span></div>`
+  $('#tblAreas').innerHTML = `<div class="arow hd"><span>Área</span><span class="bc">Satisfacción</span><span>%</span><span>vs ant.</span><span class="pt">Puntaje</span><span class="nn">n</span></div>`
     + (verHosp ? (fs?'':cabG('🏥 Hospitalización, Terapias e Imagen',nHosp)) + AREAS.map(filaArea).join('') : '')
     + (verUrg ? cabG('🚑 Urgencias',FU.length,FU.length?'Cómo terminó la atención — '+dest:'') + AREAS_URG.map(filaArea).join('') : '');
 
@@ -629,28 +773,40 @@ function renderPanel(){
     return `<tr><td>${esc(t)}</td><td><span class="tag ${c}">${pct(p)}</span></td><td>${r.length}</td></tr>`;}).join('')+'</table>';
 
   // Tendencia
-  const base = filtradas(false), meses=[]; const hoy=new Date();
-  for(let i=11;i>=0;i--){const d=new Date(hoy.getFullYear(),hoy.getMonth()-i,1); meses.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'));}
+  const base = filtradas(false);
   const NOM=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const datosT = meses.map(m=>{const fm=base.filter(f=>(f.fecha||'').slice(0,7)===m); return {m,n:fm.length,sat:contar(fm,TODAS_KEYS).sat};});
+  const semanal = $('#fModo').value!=='mes';
+  let datosT;
+  if(semanal){
+    const l0 = lunesDe(pf($('#fHasta').value));
+    datosT = [...Array(12).keys()].reverse().map(i=>{ const l=addDias(l0,-7*i), d=hoyStr(l), h=hoyStr(addDias(l,6)); const fm=base.filter(f=>f.fecha>=d&&f.fecha<=h); return {lab:fCorta(l), n:fm.length, sat:contar(fm,TODAS_KEYS).sat, act:i===0}; });
+    $('#tendTit').textContent='Tendencia semanal'; $('#tendSub').textContent='Satisfacción global de las últimas 12 semanas (cada barra empieza en lunes; la oscura es la semana revisada).';
+  } else {
+    const r=pf($('#fDesde').value);
+    datosT = [...Array(12).keys()].reverse().map(i=>{ const d=new Date(r.getFullYear(),r.getMonth()-i,1); const m=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); const fm=base.filter(f=>(f.fecha||'').slice(0,7)===m); return {lab:NOM[d.getMonth()], n:fm.length, sat:contar(fm,TODAS_KEYS).sat, act:i===0}; });
+    $('#tendTit').textContent='Tendencia mensual'; $('#tendSub').textContent='Satisfacción global de los últimos 12 meses (la barra oscura es el mes revisado).';
+  }
   const W=560,H=200,pl=34,pb=26,bw=(W-pl)/12;
   let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Satisfacción mensual">`;
-  [60,70,80,90,100].forEach(y=>{const yy=(H-pb)-(y-50)/50*(H-pb-10); svg+=`<line x1="${pl}" x2="${W}" y1="${yy}" y2="${yy}" stroke="${y===META?'#1A8A6F':'#e3e8ee'}" ${y===META?'stroke-dasharray="4 3"':''}/><text x="${pl-4}" y="${yy+4}" font-size="10" text-anchor="end" fill="#5f6b7a">${y}</text>`;});
+  [0,25,50,75,90,100].forEach(y=>{const yy=(H-pb)-y/100*(H-pb-10); svg+=`<line x1="${pl}" x2="${W}" y1="${yy}" y2="${yy}" stroke="${y===META?'#1A8A6F':'#e3e8ee'}" ${y===META?'stroke-dasharray="4 3"':''}/><text x="${pl-4}" y="${yy+4}" font-size="10" text-anchor="end" fill="#5f6b7a">${y}</text>`;});
   datosT.forEach((d,i)=>{
-    const x=pl+i*bw+bw*0.18, w=bw*0.64, lab=NOM[Number(d.m.slice(5))-1];
-    if(d.sat!=null){const v=Math.max(50,d.sat), hh=(v-50)/50*(H-pb-10); svg+=`<rect x="${x}" y="${(H-pb)-hh}" width="${w}" height="${hh}" rx="3" fill="${colorSat(d.sat)}"><title>${lab}: ${pct(d.sat)} · ${d.n} encuestas</title></rect><text x="${x+w/2}" y="${(H-pb)-hh-4}" font-size="9.5" text-anchor="middle" fill="#1d2733">${Math.round(d.sat)}</text>`;}
-    svg+=`<text x="${x+w/2}" y="${H-10}" font-size="10" text-anchor="middle" fill="#5f6b7a">${lab}</text>`;
+    const x=pl+i*bw+bw*0.18, w=bw*0.64, lab=d.lab;
+    if(d.sat!=null){const hh=Math.max(2,d.sat/100*(H-pb-10)); svg+=`<rect x="${x}" y="${(H-pb)-hh}" width="${w}" height="${hh}" rx="3" fill="${colorSat(d.sat)}" ${d.act?'stroke="#1B3A6B" stroke-width="2.5"':'opacity=".75"'}><title>${lab}: ${pct(d.sat)} · ${d.n} encuestas</title></rect><text x="${x+w/2}" y="${(H-pb)-hh-4}" font-size="9.5" text-anchor="middle" fill="#1d2733">${Math.round(d.sat)}</text>`;}
+    svg+=`<text x="${x+w/2}" y="${H-10}" font-size="${semanal?8.5:10}" text-anchor="middle" fill="${d.act?'#1B3A6B':'#5f6b7a'}" ${d.act?'font-weight="700"':''}>${lab}</text>`;
   });
   svg+='</svg>';
-  $('#tendencia').innerHTML = datosT.some(d=>d.n)? svg+'<div class="hint">Eje vertical desde 50 %. Línea punteada = meta 90 %.</div>' : '<div class="empty">Aún no hay encuestas.</div>';
+  $('#tendencia').innerHTML = datosT.some(d=>d.n)? svg+'<div class="hint">Línea punteada = meta 90 %. Las semanas sin barra no tuvieron encuestas.</div>' : '<div class="empty">Aún no hay encuestas.</div>';
 
   // Alertas
-  const al = F.filter(f=>f.alerta==='Sí').sort((a,b)=>{const pa=a.estadoSeguimiento==='Atendida'?1:0,pb2=b.estadoSeguimiento==='Atendida'?1:0; return pa-pb2 || (b.fechaHora||'').localeCompare(a.fechaHora||'');});
+  // Alertas del periodo + alertas de periodos anteriores que siguen sin atender
+  const desdeP = $('#fDesde').value;
+  const arrastradas = filtrar('', '').filter(f=>f.alerta==='Sí' && f.fecha<desdeP && f.estadoSeguimiento!=='Atendida');
+  const al = F.filter(f=>f.alerta==='Sí').concat(arrastradas).sort((a,b)=>{const pa=a.estadoSeguimiento==='Atendida'?1:0,pb2=b.estadoSeguimiento==='Atendida'?1:0; return pa-pb2 || (b.fechaHora||'').localeCompare(a.fechaHora||'');});
   $('#alertas').innerHTML = al.length ? al.map(f=>{
     const est=f.estadoSeguimiento||'Pendiente', c=est==='Atendida'?'at':(est==='En seguimiento'?'sg':'');
     const contacto = f.contacto==='Sí' ? `<div class="hint">Contacto: ${esc(f.contactoNombre||'')} ${esc(f.contactoTel||'')}</div>`:'';
     return `<div class="alert ${c}" data-folio="${esc(f.folio)}">
-      <div class="h"><b>${esc(f.folio)} · ${esc(f.servicio||'')}${f.habitacion?(esUrg(f.servicio)?' · Cubículo ':' · Hab. ')+esc(f.habitacion):''}</b><span class="hint">${esc(f.fechaHora||f.fecha||'')}</span></div>
+      <div class="h"><b>${f.fecha<desdeP?'<span class="tag warn">Pendiente de un periodo anterior</span> ':''}${esc(f.folio)} · ${esc(f.servicio||'')}${f.habitacion?(esUrg(f.servicio)?' · Cubículo ':' · Hab. ')+esc(f.habitacion):''}</b><span class="hint">${esc(f.fechaHora||f.fecha||'')}</span></div>
       <div class="mot">${esc(f.motivosAlerta||'Revisar respuestas').split(' | ').map(x=>'• '+x).join('<br>')}</div>
       ${f.comentarios?`<div class="hint">Comentario: “${esc(f.comentarios)}”</div>`:''}${contacto}
       <div class="seg" style="margin-top:8px">
@@ -686,6 +842,12 @@ $('#alertas').addEventListener('click',async e=>{
   }catch(err){ toast('No se guardó: '+err.message); b.disabled=false; b.textContent='Guardar'; }
 });
 
+$('#btnPrint').onclick=()=>{
+  document.body.classList.add('printPanel');
+  const fin=()=>{ document.body.classList.remove('printPanel'); window.removeEventListener('afterprint',fin); };
+  window.addEventListener('afterprint',fin);
+  setTimeout(()=>window.print(),100);
+};
 $('#btnCSV').onclick=()=>{
   const F=filtradas(); if(!F.length){toast('No hay encuestas en el periodo');return;}
   const cols=[]; F.forEach(f=>Object.keys(f).forEach(k=>{if(!cols.includes(k))cols.push(k);}));
