@@ -221,7 +221,7 @@ details.area[open]{background:#fafbfd;border-radius:8px}
     <div class="card"><h3>Seguridad y trato digno</h3><p class="cs">% de respuestas "Sí" (en la pregunta de incidente no resuelto, "Sí" es negativo).</p><div id="tblSeg"></div></div>
     <div class="card"><h3 id="tendTit">Tendencia</h3><p class="cs" id="tendSub"></p><div id="tendencia"></div></div>
   </div>
-  <div class="card"><h3>Alertas para seguimiento</h3><p class="cs">Se genera alerta con cualquier calificación "Malo", un "No" en las preguntas de seguridad o un incidente sin resolver. Turnar al jefe de área en ≤ 48 h. También se muestran las alertas de periodos anteriores que siguen sin marcarse como atendidas.</p><div id="alertas"></div></div>
+  <div class="card"><h3>Alertas para seguimiento</h3><p class="cs" id="alertasDesc">Se genera alerta con cualquier calificación "Malo", un "No" en las preguntas de seguridad o un incidente sin resolver. Turnar al jefe de área en ≤ 48 h. También se muestran las alertas de periodos anteriores que siguen sin marcarse como atendidas.</p><div id="alertas"></div></div>
   <div class="grid2">
     <div class="card"><h3>Quejas y sugerencias</h3><div id="comentarios"></div></div>
     <div class="card"><h3>Reconocimientos</h3><div id="reconoc"></div></div>
@@ -571,21 +571,29 @@ function abrirModal(h){ $('#mbox').innerHTML=h; $('#ov').hidden=false; }
 function cerrarModal(){ $('#ov').hidden=true; $('#mbox').innerHTML=''; }
 
 /* ===================== PANEL ===================== */
-let PIN = null, FILAS = [];
+let PIN = null, FILAS = [], ROL = 'general';
+/* Acceso por PIN: 'general' ve todo; 'admision' solo ve las preguntas de Admisión
+   (y la Recepción de Urgencias). El servidor solo le envía esos datos. */
+const ADM_AREAS = ['adm','urec'];
+const esAdm = () => ROL==='admision';
+function areasPanel(fsv){
+  const ok = a => !esAdm() || ADM_AREAS.includes(a.id);
+  return { hosp: (esUrg(fsv)?[]:AREAS).filter(ok), urg: ((!fsv||esUrg(fsv))?AREAS_URG:[]).filter(ok) };
+}
 $('#lnkPanel').onclick = e=>{
   e.preventDefault();
   abrirModal(`<h3>Acceso supervisión</h3><p class="hint">Ingrese el PIN del panel de resultados.</p><input type="password" id="pinIn" autocomplete="off"><div class="mrow"><button class="btn sec" id="pinNo">Cancelar</button><button class="btn nav" id="pinOk">Entrar</button></div>`);
   const ok = async()=>{
     const pin=$('#pinIn').value.trim(); if(!pin) return;
     $('#pinOk').disabled=true; $('#pinOk').textContent='Verificando…';
-    try{ await api({action:'verificarPin',pin}); PIN=pin; cerrarModal(); abrirPanel(); }
+    try{ const r = await api({action:'verificarPin',pin}); PIN=pin; ROL=r.rol||'general'; cerrarModal(); abrirPanel(); }
     catch(err){ toast(/PIN/i.test(err.message)?'PIN incorrecto':'Sin conexión con el servidor'); $('#pinOk').disabled=false; $('#pinOk').textContent='Entrar'; }
   };
   $('#pinOk').onclick=ok; $('#pinNo').onclick=cerrarModal;
   $('#pinIn').addEventListener('keydown',ev=>{if(ev.key==='Enter')ok();});
   setTimeout(()=>{const i=$('#pinIn'); if(i) i.focus();},50);
 };
-$('#btnSalir').onclick=()=>{ PIN=null; FILAS=[]; $('#vPanel').hidden=true; $('#vEncuesta').hidden=false; $('#subTop').textContent='Encuesta de satisfacción al egreso'; reiniciar(); };
+$('#btnSalir').onclick=()=>{ PIN=null; FILAS=[]; ROL='general'; $('#vPanel').hidden=true; $('#vEncuesta').hidden=false; $('#subTop').textContent='Encuesta de satisfacción al egreso'; reiniciar(); };
 
 /* ---------- Periodos de revisión (semana lunes–domingo, mes o rango libre) ---------- */
 const MESES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
@@ -622,7 +630,16 @@ const nomAnt = () => ({semana:'semana anterior',mes:'mes anterior',rango:'period
 
 function abrirPanel(){
   $('#vEncuesta').hidden=true; $('#navBtns').hidden=true; $('#vPanel').hidden=false;
-  $('#subTop').textContent='Panel de resultados · Encuesta de satisfacción';
+  $('#subTop').textContent = esAdm() ? 'Panel de resultados · Admisión' : 'Panel de resultados · Encuesta de satisfacción';
+  const P = areasPanel('');
+  TODAS_KEYS = P.hosp.concat(P.urg).flatMap(a=>a.items.map(i=>i[0]));
+  // Secciones que la vista de Admisión no muestra
+  $('#tblSeg').closest('.card').style.display = esAdm() ? 'none' : '';
+  $('#tblSeg').closest('.grid2').style.gridTemplateColumns = esAdm() ? '1fr' : '';
+  $('#comentarios').closest('.grid2').style.display = esAdm() ? 'none' : '';
+  $('#alertasDesc').textContent = esAdm()
+    ? 'Se genera alerta cuando una pregunta de Admisión (o de la Recepción de Urgencias) se califica como "Malo". El seguimiento que registre aquí es propio de Admisión.'
+    : 'Se genera alerta con cualquier calificación "Malo", un "No" en las preguntas de seguridad o un incidente sin resolver. Turnar al jefe de área en ≤ 48 h. También se muestran las alertas de periodos anteriores que siguen sin marcarse como atendidas.';
   if(!$('#fDesde').value){ $('#fModo').value='semana'; fijarPeriodo('semana', new Date()); }
   $('#fServ').innerHTML = '<option value="">Todos</option>'+SERVICIOS.map(s=>`<option>${esc(s)}</option>`).join('');
   cargarPanel();
@@ -658,7 +675,7 @@ function contar(filas,keys){
 const pct = x => x==null ? '—' : (Math.round(x*10)/10).toFixed(1)+' %';
 const cls = x => x==null ? 'nt' : (x>=META?'ok':(x>=80?'warn':'bad'));
 const colorSat = x => x==null ? 'var(--na)' : (x>=META?'var(--e)':(x>=80?'var(--r)':'var(--m)'));
-const TODAS_KEYS = TODAS_AREAS.flatMap(a=>a.items.map(i=>i[0]));
+let TODAS_KEYS = TODAS_AREAS.flatMap(a=>a.items.map(i=>i[0]));
 
 function stk(c){
   const t=c.E+c.B+c.R+c.M; if(!t) return '<span class="tag nt">Sin respuestas</span>';
@@ -694,35 +711,36 @@ function renderPanel(){
   const FA = filtrar(dA,hA);
   const I = indicadores(F), A = indicadores(FA);
   const fsv = $('#fServ').value;
-  $('#repTitulo').innerHTML = `<b>${esc(nombrePeriodo())}</b><span>Servicio: ${esc(fsv||'Todos')}</span><span>Comparado con: ${fCorta(pf(dA))} – ${fLarga(pf(hA))}</span>`;
+  $('#repTitulo').innerHTML = `<b>${esc(nombrePeriodo())}</b>${esAdm()?'<span>Vista: Admisión</span>':''}<span>Servicio: ${esc(fsv||'Todos')}</span><span>Comparado con: ${fCorta(pf(dA))} – ${fLarga(pf(hA))}</span>`;
   $('#kpis').innerHTML = [
     {l:'Encuestas',v:I.n,d:'contestadas en el periodo',dl:delta(I.n,FA.length?A.n:0,'n'),c:''},
-    {l:'Satisfacción global',v:pct(I.glob.sat),d:I.glob.val+' respuestas válidas',dl:delta(I.glob.sat,A.glob.sat,'%'),c:cls(I.glob.sat)},
-    {l:'Calificación general',v:pct(I.g1.sat),d:'"Calificación general de la atención"',dl:delta(I.g1.sat,A.g1.sat,'%'),c:cls(I.g1.sat)},
-    {l:'Índice de recomendación',v:I.nps==null?'—':Math.round(I.nps),d:I.npsN+' resp. · promotores − detractores',dl:delta(I.nps==null?null:Math.round(I.nps),A.nps==null?null:Math.round(A.nps),'n'),c:I.nps==null?'':(I.nps>=50?'ok':(I.nps>=0?'warn':'bad'))},
-    {l:'Regresaría a CMGA',v:pct(I.regSi),d:I.regN+' respuestas',dl:delta(I.regSi,A.regSi,'%'),c:cls(I.regSi)},
+    {l:esAdm()?'Satisfacción de Admisión':'Satisfacción global',v:pct(I.glob.sat),d:I.glob.val+' respuestas válidas',dl:delta(I.glob.sat,A.glob.sat,'%'),c:cls(I.glob.sat)},
+    {gral:1,l:'Calificación general',v:pct(I.g1.sat),d:'"Calificación general de la atención"',dl:delta(I.g1.sat,A.g1.sat,'%'),c:cls(I.g1.sat)},
+    {gral:1,l:'Índice de recomendación',v:I.nps==null?'—':Math.round(I.nps),d:I.npsN+' resp. · promotores − detractores',dl:delta(I.nps==null?null:Math.round(I.nps),A.nps==null?null:Math.round(A.nps),'n'),c:I.nps==null?'':(I.nps>=50?'ok':(I.nps>=0?'warn':'bad'))},
+    {gral:1,l:'Regresaría a CMGA',v:pct(I.regSi),d:I.regN+' respuestas',dl:delta(I.regSi,A.regSi,'%'),c:cls(I.regSi)},
     {l:'Alertas del periodo',v:I.alertas,d:`${I.pend} pendientes · ${I.seg} en seguimiento · ${I.atend} atendidas`,dl:delta(I.alertas,FA.length?A.alertas:0,'n',true),c:I.pend?'bad':'ok'}
-  ].map(k=>`<div class="kpi ${k.c}"><div class="l">${k.l}</div><div class="v">${k.v}</div><div class="d">${k.d}</div><div class="dl">${k.dl}</div></div>`).join('');
+  ].filter(k=>!(k.gral&&esAdm())).map(k=>`<div class="kpi ${k.c}"><div class="l">${k.l}</div><div class="v">${k.v}</div><div class="d">${k.d}</div><div class="dl">${k.dl}</div></div>`).join('');
 
   // Resumen del periodo
-  const keysVis = (esUrg(fsv)?AREAS_URG:(fsv?AREAS:TODAS_AREAS)).flatMap(a=>a.items.map(i=>i[0]));
+  const PV = areasPanel(fsv), areasVis = PV.hosp.concat(PV.urg);
+  const keysVis = areasVis.flatMap(a=>a.items.map(i=>i[0]));
   const porPreg = keysVis.map(k=>({k, ...contar(F,[k]), ant:contar(FA,[k]).sat})).filter(x=>x.val>0);
   const baja = porPreg.slice().sort((a,b)=>a.sat-b.sat||b.val-a.val)[0];
   const alta = porPreg.slice().sort((a,b)=>b.sat-a.sat||b.val-a.val)[0];
-  const porArea = (esUrg(fsv)?AREAS_URG:(fsv?AREAS:TODAS_AREAS)).map(a=>({a, s:contar(F,a.items.map(i=>i[0]))})).filter(x=>x.s.val>0);
+  const porArea = areasVis.map(a=>({a, s:contar(F,a.items.map(i=>i[0]))})).filter(x=>x.s.val>0);
   const aBaja = porArea.slice().sort((x,y)=>x.s.sat-y.s.sat)[0], aAlta = porArea.slice().sort((x,y)=>y.s.sat-x.s.sat)[0];
   const sinHab = F.filter(f=>!f.habitacion).length;
   const cuentaDia=[0,0,0,0,0,0,0]; F.forEach(f=>{ if(f.fecha){ const d=pf(f.fecha); cuentaDia[(d.getDay()+6)%7]++; } });
   $('#resSub').textContent = I.n ? `${I.n} encuesta(s) contestada(s).` : '';
   $('#resumen').innerHTML = !I.n ? '<div class="empty">No hay encuestas en este periodo.</div>' : `<ul class="resumen">
-      <li>Satisfacción global: <b>${pct(I.glob.sat)}</b> ${I.glob.sat!=null&&I.glob.sat>=META?'(cumple la meta)':'(por debajo de la meta de 90 %)'}.</li>
+      <li>${esAdm()?'Satisfacción de Admisión':'Satisfacción global'}: <b>${pct(I.glob.sat)}</b> ${I.glob.sat!=null&&I.glob.sat>=META?'(cumple la meta)':'(por debajo de la meta de 90 %)'}.</li>
       ${aAlta?`<li>Área mejor evaluada: <b>${esc(aAlta.a.titulo)}</b> (${pct(aAlta.s.sat)}).</li>`:''}
       ${aBaja&&aBaja!==aAlta?`<li>Área más baja: <b>${esc(aBaja.a.titulo)}</b> (${pct(aBaja.s.sat)}).</li>`:''}
       ${baja&&baja.sat<META?`<li>Pregunta más baja: <b>${esc(ETIQ[baja.k])}</b> (${pct(baja.sat)}).</li>`:''}
       ${alta?`<li>Pregunta mejor evaluada: <b>${esc(ETIQ[alta.k])}</b> (${pct(alta.sat)}).</li>`:''}
       <li>Alertas: <b>${I.alertas}</b> (${I.pend} pendientes, ${I.seg} en seguimiento, ${I.atend} atendidas).</li>
-      <li>Quejas o sugerencias: <b>${I.quejas}</b> · Reconocimientos: <b>${I.recon}</b>.</li>
-      ${sinHab?`<li>${sinHab} encuesta(s) sin habitación o cubículo (capturadas antes de que fuera obligatorio).</li>`:''}
+      ${esAdm()?'':`<li>Quejas o sugerencias: <b>${I.quejas}</b> · Reconocimientos: <b>${I.recon}</b>.</li>`}
+      ${sinHab&&!esAdm()?`<li>${sinHab} encuesta(s) sin habitación o cubículo (capturadas antes de que fuera obligatorio).</li>`:''}
     </ul>
     <div class="hint" style="margin-top:10px">Encuestas por día de la semana:</div>
     <div class="dias">${DIAS.map((d,i)=>`<div><b>${cuentaDia[i]}</b>${d}</div>`).join('')}</div>`;
@@ -733,9 +751,9 @@ function renderPanel(){
     const fa=F.filter(f=>f.servicio===sv), fb=FA.filter(f=>f.servicio===sv);
     if(!fa.length && !fb.length) return '';
     const ia=indicadores(fa), ib=indicadores(fb);
-    return `<tr><td>${esc(sv)}</td><td>${ia.n}</td><td><span class="tag ${cls(ia.glob.sat)}">${pct(ia.glob.sat)}</span></td><td>${deltaCorto(ia.glob.sat,ib.glob.sat)}</td><td>${ia.nps==null?'—':Math.round(ia.nps)}</td><td>${ia.alertas?`<span class="tag bad">${ia.alertas}</span>`:'0'}</td></tr>`;
+    return `<tr><td>${esc(sv)}</td><td>${ia.n}</td><td><span class="tag ${cls(ia.glob.sat)}">${pct(ia.glob.sat)}</span></td><td>${deltaCorto(ia.glob.sat,ib.glob.sat)}</td>${esAdm()?'':`<td>${ia.nps==null?'—':Math.round(ia.nps)}</td>`}<td>${ia.alertas?`<span class="tag bad">${ia.alertas}</span>`:'0'}</td></tr>`;
   }).join('');
-  $('#tblServ').innerHTML = filasServ ? `<table><tr><th>Servicio</th><th>Encuestas</th><th>Satisf.</th><th>vs ant.</th><th>Recom.</th><th>Alertas</th></tr>${filasServ}</table>` : '<div class="empty">Sin encuestas en este periodo ni en el anterior.</div>';
+  $('#tblServ').innerHTML = filasServ ? `<table><tr><th>Servicio</th><th>Encuestas</th><th>Satisf.</th><th>vs ant.</th>${esAdm()?'':'<th>Recom.</th>'}<th>Alertas</th></tr>${filasServ}</table>` : '<div class="empty">Sin encuestas en este periodo ni en el anterior.</div>';
 
   // Preguntas a atender
   const crit = porPreg.filter(x=>x.sat<META).sort((a,b)=>a.sat-b.sat||b.val-a.val);
@@ -758,13 +776,13 @@ function renderPanel(){
         <div style="padding:0 6px 10px">${leg}<table><tr><th>Pregunta</th><th>Distribución</th><th>Satisf.</th><th>vs ant.</th><th>N/A</th></tr>${det}</table></div></details>`;
   };
   const fs = $('#fServ').value;
-  const verHosp = !esUrg(fs), verUrg = !fs || esUrg(fs);
+  const verHosp = PV.hosp.length>0, verUrg = PV.urg.length>0;
   const nHosp = F.filter(f=>!esUrg(f.servicio)).length, FU = F.filter(f=>esUrg(f.servicio));
   const dest = DESTINOS_URG.map(d=>`${d}: <b>${FU.filter(f=>f.destinoUrg===d).length}</b>`).join(' · ');
   const cabG = (t,n,extra='') => `<div class="grp"><b>${t}</b> <span>${n} encuesta(s)</span>${extra?`<div class="hint" style="margin-top:4px">${extra}</div>`:''}</div>`;
   $('#tblAreas').innerHTML = `<div class="arow hd"><span>Área</span><span class="bc">Satisfacción</span><span>%</span><span>vs ant.</span><span class="pt">Puntaje</span><span class="nn">n</span></div>`
-    + (verHosp ? (fs?'':cabG('🏥 Hospitalización, Terapias e Imagen',nHosp)) + AREAS.map(filaArea).join('') : '')
-    + (verUrg ? cabG('🚑 Urgencias',FU.length,FU.length?'Cómo terminó la atención — '+dest:'') + AREAS_URG.map(filaArea).join('') : '');
+    + (verHosp ? (fs?'':cabG('🏥 Hospitalización, Terapias e Imagen',nHosp)) + PV.hosp.map(filaArea).join('') : '')
+    + (verUrg ? cabG('🚑 Urgencias',FU.length,FU.length&&!esAdm()?'Cómo terminó la atención — '+dest:'') + PV.urg.map(filaArea).join('') : '');
 
   // Seguridad
   $('#tblSeg').innerHTML = `<table><tr><th>Pregunta</th><th>Sí</th><th>n</th></tr>`+SEG.map(([k,t])=>{
@@ -814,6 +832,7 @@ function renderPanel(){
         <input type="text" placeholder="Nota de seguimiento (acción tomada, responsable)" value="${esc(f.notaSeguimiento||'')}" maxlength="500">
         <button class="btn nav sm" data-seg>Guardar</button>
       </div>${f.fechaSeguimiento?`<div class="hint">Última actualización: ${esc(f.fechaSeguimiento)}</div>`:''}
+      ${!esAdm()&&f.estadoSegAdm?`<div class="hint">Seguimiento de Admisión: <b>${esc(f.estadoSegAdm)}</b>${f.notaSegAdm?' — '+esc(f.notaSegAdm):''}${f.fechaSegAdm?' ('+esc(f.fechaSegAdm)+')':''}</div>`:''}
     </div>`;}).join('') : '<div class="empty">Sin alertas en el periodo. 👍</div>';
 
   // Comentarios / reconocimientos
